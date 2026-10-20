@@ -1,4 +1,4 @@
-# Startbildschirm IT-Ticket-Simulator (Codex CLI / ChatGPT)
+﻿# Startbildschirm IT-Ticket-Simulator (Codex CLI / ChatGPT)
 $Model = if ($env:SIM_MODEL) { $env:SIM_MODEL } else { "gpt-6-luna" }  # ChatGPT 6 Luna – ID ggf. anpassen
 
 Set-Location $PSScriptRoot
@@ -35,7 +35,7 @@ if ($LASTEXITCODE -ne 0) {
 
 # 4) Statistik-Kurzinfo
 if (Test-Path stats/karriere.md) {
-  Select-String -Path stats/karriere.md -Pattern "Aktuelles Level|Naechste|Nächste Ticketnummer|Abgeschlossene Tickets|Durchschnittliche Punktzahl" |
+  Select-String -Path stats/karriere.md -Pattern "Aktuelles Level|Ticketnummer|Abgeschlossene Tickets|Durchschnittliche Punktzahl" |
     ForEach-Object { ($_.Line -replace '^\|\s*','' -replace '\s*\|\s*$','' -replace '\s*\|\s*',': ') }
   Write-Host ""
 }
