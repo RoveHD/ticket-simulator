@@ -4,13 +4,11 @@ Systemadministrator-Training: ChatGPT simuliert über die Codex CLI eine Unterne
 
 ## Start
 
-```bash
-npm install -g @openai/codex   # einmalig
-cd ticket-simulator
-codex                          # mit ChatGPT-Konto anmelden
-```
+- **Windows:** `start.cmd` doppelklicken
+- **Linux/macOS:** `./start.sh`
 
-Dann eingeben: `Start`
+Der Startbildschirm prüft Node.js, Codex CLI (bietet Installation an) und ChatGPT-Anmeldung, zeigt den Karrierestand und startet dann mit Modell **ChatGPT 6 Luna** (`gpt-6-luna`).
+Voraussetzung: ChatGPT-Konto mit Codex-Kontingent. Anderes Modell: Umgebungsvariable `SIM_MODEL` setzen.
 
 Codex liest `AGENTS.md` automatisch, dort steht das komplette Regelwerk.
 
