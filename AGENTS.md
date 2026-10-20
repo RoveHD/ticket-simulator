@@ -21,7 +21,7 @@ Der Benutzer spielt den Systemadministrator. Du simulierst eine vollständige Un
 
 ## 1. Grundregeln
 
-- Immer nur ein Ticket gleichzeitig.
+- Immer nur ein Ticket gleichzeitig (Ausnahme: Speedrun-Modus, Abschnitt 11).
 - Jedes Ticket hat eine vorab festgelegte, technisch plausible Ursache.
 - Verändere Ursachen nicht nachträglich, um Entscheidungen passend oder unpassend erscheinen zu lassen.
 - Verrate niemals ungefragt Lösungen oder Hinweise.
@@ -173,3 +173,38 @@ Bei `Start` (oder erster Nachricht ohne offenes Ticket):
 1. Falls nicht vorhanden: technisch vollständige, konsistente Unternehmensumgebung in `.sim/intern/umgebung.md` anlegen.
 2. Nächstes Ticket auf aktuellem Level erzeugen (erstes Ticket: #1001, Level 3 – Junior-Systemadministrator). Ursache, Konfiguration, mögliche Folgen und Referenzzeit intern in `.sim/intern/ticket-<NR>.md` festlegen, bevor der Benutzer handelt.
 3. Ausschließlich das Ticket zeigen und auf die Aktion des Benutzers warten.
+
+## 11. Speedrun-Modus
+
+Ausgelöst durch die Nachricht `Speedrun:<id>` (Fortsetzen: `Speedrun-Fortsetzen:<id>`). Der Ankunftsplan steht in `.sim/intern/speedrun/<id>.json` (vom Programm zufällig erzeugt): `duration` (Schichtdauer in simulierten Minuten), `level`, `arrivals` (Ankunftsminute, Priorität, Themenbereich je Ticket).
+
+**Vorbereitung (vor der ersten Benutzeraktion):**
+- Plan lesen. Für **jedes** Ticket vorab Ursache, Konfiguration, Folgen und Referenzzeit (passend zu Level und Thema) in `.sim/intern/speedrun/<id>-tickets.md` festlegen. Ankunftszeiten, Prioritäten und Themen aus dem Plan nie ändern. Ticketanzahl dem Benutzer nicht verraten.
+- Ticketnummern ab `S<laufende Nr.>` (z. B. S01, S02 …), getrennt von der Karriere-Nummerierung.
+- Schichtzeit startet bei Minute 0 mit dem ersten Ticket.
+
+**Ablauf:**
+- Es gilt eine gemeinsame simulierte Schichtuhr. Jede Aktion verbraucht Zeit nach Abschnitt 4.
+- Erreicht die Uhr die Ankunftsminute eines Tickets, erscheint es sofort nach dem Ergebnis der aktuellen Aktion (Kopfdaten wie in Abschnitt 3).
+- Mehrere Tickets dürfen offen sein. Der Benutzer arbeitet immer an einem; Wechsel mit `Wechsel S03` (kostet 1 Min.). Ohne Angabe gilt das zuletzt bearbeitete Ticket.
+- Offene, unbearbeitete Tickets verschlimmern sich realistisch (z. B. Eskalation, mehr Betroffene), aber nur gemäß der festgelegten Ursache.
+- Ein Ticket gilt als gelöst nach Wiederherstellung + Überprüfung (Abschnitt 1). Kurze Bestätigung, **keine** Bewertung während der Schicht.
+- `Hilfe` erlaubt (Abzug wie gewohnt). `Aufgeben S03` gibt ein einzelnes Ticket auf. `Schicht beenden` beendet vorzeitig.
+- Nach jeder Antwort Statuszeile anzeigen:
+  `⏱️ Schicht: X/Y Min. · Aktiv: S0n · Queue: S0a (P2, wartet 12 Min.), S0b (P4, …) · Gelöst: n`
+- Aktions-/Zeitprotokoll laufend in `.sim/intern/speedrun/<id>-tickets.md` fortschreiben.
+- Erreicht die Uhr `duration`, endet die Schicht sofort (laufende Aktion wird nicht mehr abgeschlossen).
+
+**SLA (Zeit von Ankunft bis Lösung):** P1 30 Min. · P2 60 Min. · P3 120 Min. · P4 240 Min.
+
+**Wertung:**
+- Jedes gelöste Ticket: Kurzbewertung nach Abschnitt 6 (0–100).
+- SLA überschritten: P1 −25 · P2 −15 · P3 −10 · P4 −5.
+- Am Schichtende offen/ungelöst oder aufgegeben: P1 −30 · P2 −20 · P3 −10 · P4 −5.
+- Verursachter Zusatzschaden (Sicherheit/Ausfall): −10 bis −40 je nach Schwere.
+- **Speedrun-Score** = Summe aller Ticketpunkte − Abzüge (Minimum 0).
+
+**Abschluss:**
+- Bericht anzeigen und unter `stats/speedrun/<id>.md` speichern: Schichtdauer, Level, eingegangene/gelöste/offene Tickets, je Ticket (Nr., Priorität, Thema, Ursache, Lösung, Lösungszeit vs. Referenz, SLA ok/verletzt, Punkte, Abzüge), Speedrun-Score, Triage-Auswertung (wurden Prioritäten richtig gewählt?), wichtigste Verbesserungen, realistisch einsparbare Zeit.
+- `stats/speedrun.md` aktualisieren: Highscore-Tabelle je Schichtdauer (absteigend nach Score) und Verlauf aller Runs.
+- Speedruns beeinflussen das Karriere-Level nicht, Stärken/Wissenslücken dürfen aber in `stats/karriere.md` ergänzt werden.
