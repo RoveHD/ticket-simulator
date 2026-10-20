@@ -1,5 +1,5 @@
 ﻿# Startbildschirm IT-Ticket-Simulator (Codex CLI / ChatGPT)
-$Model = if ($env:SIM_MODEL) { $env:SIM_MODEL } else { "gpt-6-luna" }  # ChatGPT 6 Luna – ID ggf. anpassen
+$Model = if ($env:SIM_MODEL) { $env:SIM_MODEL } else { "gpt-6-luna" }  # ChatGPT 6 Luna (offizielle ID)
 
 Set-Location $PSScriptRoot
 Clear-Host

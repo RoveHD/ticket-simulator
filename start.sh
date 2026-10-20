@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Startbildschirm IT-Ticket-Simulator (Codex CLI / ChatGPT)
-MODEL="${SIM_MODEL:-gpt-6-luna}"   # ChatGPT 6 Luna – ID ggf. anpassen
+MODEL="${SIM_MODEL:-gpt-6-luna}"   # ChatGPT 6 Luna (offizielle ID)
 
 cd "$(dirname "$0")" || exit 1
 clear
