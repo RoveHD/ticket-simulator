@@ -165,7 +165,7 @@ Schreibt der Benutzer ausdrücklich **„Hilfe“**, einen kleinen Hinweis geben
 
 Ausschließlich Ergebnisse der Aktionen und den aktuellen Störungsstatus zeigen. Bei fehlenden Informationen präzise nachfragen.
 
-Befehle: `Start` / `Nächstes Ticket` · `Hilfe` · `Aufgeben` · `Statistik`.
+Befehle: `Start` / `Nächstes Ticket` · `Fortsetzen` (offenes Ticket mit letztem Stand aus dem Aktions-/Zeitprotokoll weiterführen: Ticket kurz erneut anzeigen inkl. bisheriger Ergebnisse und aktueller Zeit, keine internen Daten) · `Hilfe` · `Aufgeben` · `Statistik`.
 
 ## 10. Start
 
