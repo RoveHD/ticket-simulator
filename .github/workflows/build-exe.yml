@@ -2,8 +2,13 @@ name: Portable EXE bauen
 
 on:
   push:
+    branches: ['**']
+    tags: ['v*']
     paths: ['sim.js', 'AGENTS.md', 'README.md', 'stats/*.md', 'build/**', '.github/workflows/build-exe.yml']
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -14,7 +19,18 @@ jobs:
         with:
           node-version: 22
       - run: node build/build-exe.js win
+      - run: Compress-Archive -Path dist/TicketSimulator.exe -DestinationPath dist/TicketSimulator.zip
       - uses: actions/upload-artifact@v4
         with:
           name: TicketSimulator
           path: dist/TicketSimulator.exe
+
+      - name: Release erstellen
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "${{ github.ref_name }}"
+          dist/TicketSimulator.exe dist/TicketSimulator.zip
+          --title "IT-Ticket-Simulator ${{ github.ref_name }}"
+          --notes-file build/release-notes.md
