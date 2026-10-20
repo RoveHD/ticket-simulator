@@ -6,6 +6,10 @@ on:
     tags: ['v*']
     paths: ['sim.js', 'AGENTS.md', 'README.md', 'stats/*.md', 'build/**', '.github/workflows/build-exe.yml']
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release-Version (z. B. v1.0.0), leer = nur bauen'
+        required: false
 
 permissions:
   contents: write
@@ -26,11 +30,13 @@ jobs:
           path: dist/TicketSimulator.exe
 
       - name: Release erstellen
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.version != ''
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version || github.ref_name }}
         run: >
-          gh release create "${{ github.ref_name }}"
+          gh release create "$env:VERSION"
           dist/TicketSimulator.exe dist/TicketSimulator.zip
-          --title "IT-Ticket-Simulator ${{ github.ref_name }}"
+          --target "${{ github.sha }}"
+          --title "IT-Ticket-Simulator $env:VERSION"
           --notes-file build/release-notes.md
