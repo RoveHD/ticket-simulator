@@ -2,7 +2,18 @@
 
 Systemadministrator-Training: ChatGPT simuliert über die Codex CLI eine Unternehmens-IT samt Tickets und bewertet dich.
 
-## Start
+## Portable EXE (Windows)
+
+`TicketSimulator.exe` in einen eigenen Ordner legen (z. B. auf dem USB-Stick) und doppelklicken. Kein Node.js nötig.
+
+- Beim ersten Start legt die EXE `AGENTS.md`, `stats/` und `.sim/` neben sich an.
+- Fehlt die Codex CLI, lädt sie die portable Version (ca. 170 MB) nach `codex\`.
+- Die ChatGPT-Anmeldung landet in `.codex-home\` im selben Ordner, also alles mitnehmbar.
+- Windows SmartScreen kann warnen (EXE nicht signiert): „Weitere Informationen“ → „Trotzdem ausführen“.
+
+Selbst bauen: `node build/build-exe.js` → `dist/TicketSimulator.exe`. GitHub Actions baut sie bei jedem Push automatisch (Artefakt „TicketSimulator“).
+
+## Start aus dem Quellcode
 
 - **Windows:** `start.cmd` doppelklicken
 - **Linux/macOS:** `./start.sh`

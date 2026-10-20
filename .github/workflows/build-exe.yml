@@ -1,0 +1,20 @@
+name: Portable EXE bauen
+
+on:
+  push:
+    paths: ['sim.js', 'AGENTS.md', 'README.md', 'stats/*.md', 'build/**', '.github/workflows/build-exe.yml']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node build/build-exe.js win
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TicketSimulator
+          path: dist/TicketSimulator.exe

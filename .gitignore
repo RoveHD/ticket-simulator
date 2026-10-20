@@ -1,1 +1,5 @@
 config.json
+dist/
+codex/
+.codex-home/
+codex-download.zip

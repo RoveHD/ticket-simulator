@@ -7,7 +7,13 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const readline = require('readline/promises');
 
-const ROOT = __dirname;
+// Als portable EXE (Node SEA) liegen alle Daten neben der EXE, sonst neben sim.js
+let sea = null;
+try {
+  sea = require('node:sea');
+} catch {}
+const IS_SEA = !!(sea && sea.isSea());
+const ROOT = IS_SEA ? path.dirname(process.execPath) : __dirname;
 const CONFIG_FILE = path.join(ROOT, 'config.json');
 const STATS_FILE = path.join(ROOT, 'stats', 'karriere.md');
 const REPORT_DIR = path.join(ROOT, 'stats', 'berichte');
@@ -17,6 +23,12 @@ const SPEEDRUN_RESULTS = path.join(ROOT, 'stats', 'speedrun');
 const SPEEDRUN_STATS = path.join(ROOT, 'stats', 'speedrun.md');
 const DEFAULT_MODEL = 'gpt-6-luna';
 const IS_WIN = process.platform === 'win32';
+
+// Portable Codex (nur Windows x64): wird bei Bedarf neben die EXE geladen
+const PORTABLE_CODEX_DIR = path.join(ROOT, 'codex');
+const PORTABLE_CODEX_EXE = path.join(PORTABLE_CODEX_DIR, 'codex-x86_64-pc-windows-msvc.exe');
+const PORTABLE_CODEX_URL = 'https://github.com/openai/codex/releases/latest/download/codex-x86_64-pc-windows-msvc.exe.zip';
+const CAN_PORTABLE_CODEX = IS_WIN && process.arch === 'x64';
 
 const c = {
   bold: (s) => `\x1b[1m${s}\x1b[0m`,
@@ -31,6 +43,25 @@ const newRl = () => readline.createInterface({ input: process.stdin, output: pro
 let rl = newRl();
 const ask = (q) => rl.question(q);
 const pause = () => ask(c.dim('\nEnter = zurück zum Menü … '));
+
+// ---------- Erststart (portable EXE) ----------
+
+// In die EXE eingebettete Dateien beim ersten Start neben der EXE anlegen
+const EMBEDDED_FILES = {
+  'AGENTS.md': 'AGENTS.md',
+  'README.md': 'README.md',
+  'karriere.md': 'stats/karriere.md',
+  'speedrun.md': 'stats/speedrun.md',
+};
+
+function ensureFiles() {
+  for (const dir of [REPORT_DIR, SPEEDRUN_RESULTS, SPEEDRUN_DIR]) fs.mkdirSync(dir, { recursive: true });
+  if (!IS_SEA) return;
+  for (const [asset, rel] of Object.entries(EMBEDDED_FILES)) {
+    const target = path.join(ROOT, rel);
+    if (!fs.existsSync(target)) fs.writeFileSync(target, sea.getAsset(asset, 'utf8'));
+  }
+}
 
 // ---------- Konfiguration ----------
 
@@ -48,9 +79,11 @@ function saveConfig(cfg) {
 
 // ---------- Externe Programme ----------
 
+let codexCmd = 'codex';
+
 function run(cmd, args, opts = {}) {
-  // npm-Shims unter Windows (codex.cmd) brauchen eine Shell
-  return spawnSync(cmd, args, { cwd: ROOT, shell: IS_WIN, ...opts });
+  // npm-Shims unter Windows (codex.cmd) brauchen eine Shell; absolute EXE-Pfade nicht (Leerzeichen im Pfad)
+  return spawnSync(cmd, args, { cwd: ROOT, shell: IS_WIN && !path.isAbsolute(cmd), ...opts });
 }
 
 function has(cmd) {
@@ -58,26 +91,75 @@ function has(cmd) {
   return r.status === 0;
 }
 
-async function checkPrerequisites() {
-  if (!has('npm')) {
-    console.log(c.red('\n❌ Node.js/npm fehlt. Installieren: https://nodejs.org (LTS)'));
-    return false;
+async function downloadPortableCodex() {
+  const zip = path.join(ROOT, 'codex-download.zip');
+  console.log(c.dim(`\nLade ${PORTABLE_CODEX_URL} …`));
+  const res = await fetch(PORTABLE_CODEX_URL);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const total = Number(res.headers.get('content-length')) || 0;
+  const out = fs.createWriteStream(zip);
+  let done = 0;
+  for await (const chunk of res.body) {
+    out.write(chunk);
+    done += chunk.length;
+    const mb = (done / 1048576).toFixed(0);
+    process.stdout.write(`\r   ${mb} MB${total ? ` / ${(total / 1048576).toFixed(0)} MB` : ''}   `);
   }
+  await new Promise((resolve, reject) => out.end((err) => (err ? reject(err) : resolve())));
+  console.log(c.dim('\n   Entpacke …'));
+  fs.mkdirSync(PORTABLE_CODEX_DIR, { recursive: true });
+  // tar.exe ist ab Windows 10 enthalten und entpackt ZIP
+  const r = spawnSync('tar', ['-xf', zip, '-C', PORTABLE_CODEX_DIR], { stdio: 'inherit' });
+  fs.rmSync(zip, { force: true });
+  if (r.status !== 0 || !fs.existsSync(PORTABLE_CODEX_EXE)) throw new Error('Entpacken fehlgeschlagen');
+}
 
-  if (!has('codex')) {
-    console.log(c.yellow('\n⚠️  Codex CLI ist nicht installiert.'));
-    console.log('   Benötigt: Codex CLI + ChatGPT-Konto mit Codex-Kontingent.');
-    const a = await ask('   Jetzt installieren (npm install -g @openai/codex)? [j/N] ');
-    if (!/^[jy]$/i.test(a.trim())) return false;
-    if (run('npm', ['install', '-g', '@openai/codex'], { stdio: 'inherit' }).status !== 0) {
-      console.log(c.red('❌ Installation fehlgeschlagen.'));
-      return false;
+async function findOrInstallCodex() {
+  if (fs.existsSync(PORTABLE_CODEX_EXE)) return PORTABLE_CODEX_EXE;
+  if (has('codex')) return 'codex';
+
+  console.log(c.yellow('\n⚠️  Codex CLI ist nicht installiert.'));
+  console.log('   Benötigt: Codex CLI + ChatGPT-Konto mit Codex-Kontingent.');
+
+  if (CAN_PORTABLE_CODEX) {
+    const a = await ask('   Portable Codex CLI neben die EXE herunterladen (ca. 170 MB)? [j/N] ');
+    if (!/^[jy]$/i.test(a.trim())) return null;
+    try {
+      await downloadPortableCodex();
+      return PORTABLE_CODEX_EXE;
+    } catch (err) {
+      console.log(c.red(`❌ Download fehlgeschlagen: ${err.message}`));
+      return null;
     }
   }
 
-  if (run('codex', ['login', 'status'], { stdio: 'ignore' }).status !== 0) {
+  if (!has('npm')) {
+    console.log(c.red('❌ Node.js/npm fehlt. Installieren: https://nodejs.org (LTS)'));
+    return null;
+  }
+  const a = await ask('   Jetzt installieren (npm install -g @openai/codex)? [j/N] ');
+  if (!/^[jy]$/i.test(a.trim())) return null;
+  if (run('npm', ['install', '-g', '@openai/codex'], { stdio: 'inherit' }).status !== 0) {
+    console.log(c.red('❌ Installation fehlgeschlagen.'));
+    return null;
+  }
+  return 'codex';
+}
+
+async function checkPrerequisites() {
+  const cmd = await findOrInstallCodex();
+  if (!cmd) return false;
+  codexCmd = cmd;
+
+  // Portable Codex speichert die Anmeldung ebenfalls neben der EXE (USB-Stick-tauglich)
+  if (codexCmd === PORTABLE_CODEX_EXE) {
+    process.env.CODEX_HOME = path.join(ROOT, '.codex-home');
+    fs.mkdirSync(process.env.CODEX_HOME, { recursive: true });
+  }
+
+  if (run(codexCmd, ['login', 'status'], { stdio: 'ignore' }).status !== 0) {
     console.log(c.yellow('\n⚠️  Nicht bei ChatGPT angemeldet. Anmeldung startet …'));
-    if (run('codex', ['login'], { stdio: 'inherit' }).status !== 0) {
+    if (run(codexCmd, ['login'], { stdio: 'inherit' }).status !== 0) {
       console.log(c.red('❌ Anmeldung fehlgeschlagen.'));
       return false;
     }
@@ -89,7 +171,7 @@ function startCodex(prompt, cfg) {
   console.log(c.dim(`\nStarte Codex (${cfg.model}) … Beenden der Sitzung mit /quit oder Strg+C.\n`));
   // Terminal komplett an Codex übergeben, danach Eingabe neu öffnen
   rl.close();
-  const r = run('codex', ['-m', cfg.model, '--sandbox', 'workspace-write', prompt], { stdio: 'inherit' });
+  const r = run(codexCmd, ['-m', cfg.model, '--sandbox', 'workspace-write', prompt], { stdio: 'inherit' });
   rl = newRl();
   if (r.status !== 0 && r.status !== null) {
     console.log(c.yellow('\n⚠️  Codex wurde mit Fehler beendet. Bei Limit-Meldung ist das Kontingent aufgebraucht –'));
@@ -296,6 +378,7 @@ function header(cfg) {
 }
 
 async function main() {
+  ensureFiles();
   const cfg = loadConfig();
   header(cfg);
   if (!(await checkPrerequisites())) {
