@@ -26,10 +26,14 @@ module.exports=async(win,directory,painted)=>{
   if(!document.querySelector('.profile-quick .title-mythic')||!document.querySelector('.profile-quick .emblem-singularity'))throw Error('Header trophy effects missing');`);
  await painted();
  fs.writeFileSync(path.join(directory,'pass-equipped.png'),(await contents.capturePage(undefined,{stayHidden:true,stayAwake:true})).toPNG());
- contents.debugger.attach('1.3');
+ const sharedMediaSession=contents.debugger.isAttached();
+ if(!sharedMediaSession)contents.debugger.attach('1.3');
  try{
   await contents.debugger.sendCommand('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
   await contents.executeJavaScript(`if([...document.querySelectorAll('.reward-title,.em-orbit,.em-symbol')].some(el=>getComputedStyle(el).animationName!=='none'))throw Error('Trophies ignore reduced motion');`);
- }finally{await contents.debugger.sendCommand('Emulation.setEmulatedMedia',{features:[]});contents.debugger.detach();}
+ }finally{
+  await contents.debugger.sendCommand('Emulation.setEmulatedMedia',{features:sharedMediaSession?[{name:'prefers-reduced-motion',value:'no-preference'}]:[]});
+  if(!sharedMediaSession)contents.debugger.detach();
+ }
  return {passEmblems:true,equippedEffects:true,passReducedMotion:true};
 };

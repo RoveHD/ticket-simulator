@@ -77,12 +77,19 @@ async function start() {
   await win.loadURL(origin);
   if (smoke) {
     try {
+      // Attach after navigation has created the renderer. Keep this test-owned
+      // media session across reloads; reduced motion is checked separately.
+      win.webContents.debugger.attach('1.3');
+      await win.webContents.debugger.sendCommand('Emulation.setEmulatedMedia', {
+        features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }],
+      });
       await backend.ready;
       const result = await win.webContents.executeJavaScript(`new Promise((resolve,reject) => {
         const inspect = () => {
           if (!document.querySelector('.start-screen,.companion-profile')) return false;
           resolve({ title:document.title, heading:document.querySelector('h1').textContent,
             navigation:document.querySelectorAll('.nav-button').length,
+            reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches,
             nodeExposed:typeof require !== 'undefined' || typeof process !== 'undefined',
             width:document.documentElement.clientWidth, contentWidth:document.documentElement.scrollWidth });
           return true;
@@ -92,7 +99,7 @@ async function start() {
         observer.observe(document.body,{childList:true,subtree:true});
         const timer=setTimeout(()=>{observer.disconnect();reject(new Error('UI wurde nicht bereit: '+document.body.innerText.slice(-1800)));},15000);
       })`);
-      if (result.navigation !== 10 || result.nodeExposed || result.contentWidth > result.width) throw new Error('Desktop-Oberfläche oder Isolation ungültig.');
+      if (result.navigation !== 10 || result.nodeExposed || result.contentWidth > result.width || result.reducedMotion) throw new Error('Desktop-Oberfläche, Isolation oder Animations-Testbasis ungültig.');
       if (rendererErrors.length) throw new Error(rendererErrors.join('\n'));
       const painted = () => win.webContents.executeJavaScript('new Promise(resolve => requestAnimationFrame(() => { for(const animation of document.getAnimations()) { if(animation.effect?.getTiming().iterations!==Infinity) animation.finish(); } requestAnimationFrame(resolve); }))');
       await painted();

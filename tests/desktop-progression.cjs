@@ -214,11 +214,15 @@ module.exports = async (win, directory, painted) => {
     if(!document.querySelector('#mastery-forms .tier-astral.earned'))throw Error('Astral-Meisterung nicht freigeschaltet');
     if(document.querySelectorAll('#mastery-dns .mastery-badge-preview').length!==3)throw Error('Astral verändert die drei Badges');
     if(document.documentElement.scrollWidth>document.documentElement.clientWidth)throw Error('Astral-Meisterung läuft über');`);
-  await contents.debugger.attach('1.3');
+  const sharedMediaSession = contents.debugger.isAttached();
+  if (!sharedMediaSession) contents.debugger.attach('1.3');
   try {
     await contents.debugger.sendCommand('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
     await contents.executeJavaScript(`if([...document.querySelectorAll('.eternal-current,.eternal-counter,.eternal-crystals,.eternal-spark,.frame-eternal,.frame-astral,.frame-astral>img,.eternal-preview-core,.astral-halo,.astral-light-sweep')].some(el=>getComputedStyle(el).animationName!=='none'))throw Error('Reduzierte Bewegung wird bei Prestige-Effekten ignoriert');`);
-  } finally { await contents.debugger.sendCommand('Emulation.setEmulatedMedia', { features: [] }); contents.debugger.detach(); }
+  } finally {
+    await contents.debugger.sendCommand('Emulation.setEmulatedMedia', { features: sharedMediaSession ? [{ name: 'prefers-reduced-motion', value: 'no-preference' }] : [] });
+    if (!sharedMediaSession) contents.debugger.detach();
+  }
   const passEffects=await require('./desktop-pass.cjs')(win,directory,painted);
   const snakeEffects=await require('./desktop-snake.cjs')(win,directory,painted);
   await contents.executeJavaScript(`refresh()`);

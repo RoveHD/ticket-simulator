@@ -1,5 +1,7 @@
 ## Ticket Simulator – Windows-Desktop-App
 
+**Neu in 1.6.1:** Der Desktop-Test prüft normale Animationen mit einer festgelegten Testbasis und reduzierte Bewegung separat. Dadurch hängt die Release-Prüfung nicht mehr von den Animationseinstellungen des Windows-Buildrechners ab. Die Einstellungen der installierten App und ihre Unterstützung für reduzierte Bewegung bleiben unverändert.
+
 **Neu in 1.6.0:** Linux, Hardwarediagnose & Reparatur und Hardwareberatung & Verkauf haben eigene Meisterungen, Missionen, Titel und Abzeichen. Gespeicherte gelöste Linux-Fälle zählen mit. Hardwaredefekte und Beschaffungsaufträge ergänzen alle sechs Schwierigkeitsstufen. Die Technikberatung umfasst unter anderem Fernseher, Handys/Tablets, Router/WLAN, Gaming, Audio, Wearables, Smart Home, Foto/Video, Haushaltsgeräte, Lade- und Werkstatttechnik. Drei vergleichbare fiktive Angebote pro Beratungsfall trainieren Preis-Leistung, Kompatibilität, Folgekosten sowie begründete Kauf- und Nichtkaufempfehlungen. Preise sind ausdrücklich simulierte EUR-Trainingspreise. Insgesamt stehen 78 Themenfamilien und 14 Fachmeisterungen bereit. App-Icon und Favicon verwenden jetzt die dunkelblaue, violette und cyanfarbene App-Palette.
 
 Diese Veröffentlichung enthält außerdem die lokale Desktop-Oberfläche mit integrierter ChatGPT-/Codex-Anbindung, Karriere und Rangpunkten, Speedrun-Leitstelle, Missionen, Battlepass und dem Begleitersystem einschließlich der nachfolgend beschriebenen Erweiterungen.

@@ -44,10 +44,14 @@ module.exports = async (win, directory, painted) => {
   await contents.executeJavaScript(`Promise.all([...document.querySelectorAll('#main img')].map(img=>{img.loading='eager';return img.decode();}))`);
   await painted();
   fs.writeFileSync(path.join(directory,'snake-mastery.png'),(await contents.capturePage(undefined,{stayHidden:true,stayAwake:true})).toPNG());
-  contents.debugger.attach('1.3');
+  const sharedMediaSession=contents.debugger.isAttached();
+  if(!sharedMediaSession)contents.debugger.attach('1.3');
   try {
     await contents.debugger.sendCommand('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
     await contents.executeJavaScript(`if([...document.querySelectorAll('.portrait-creature')].some(el=>getComputedStyle(el).animationName!=='none'))throw Error('Schlange ignoriert reduzierte Bewegung');`);
-  } finally {await contents.debugger.sendCommand('Emulation.setEmulatedMedia',{features:[]});contents.debugger.detach();}
+  } finally {
+    await contents.debugger.sendCommand('Emulation.setEmulatedMedia',{features:sharedMediaSession?[{name:'prefers-reduced-motion',value:'no-preference'}]:[]});
+    if(!sharedMediaSession)contents.debugger.detach();
+  }
   return {snakeBreakout:true,separateStaticBackground:true,transparentSnake:true};
 };

@@ -7,7 +7,8 @@ const output = path.join(root, 'output', `desktop-smoke-${Date.now()}`);
 fs.mkdirSync(output, { recursive: true });
 const env = { ...process.env, SIM_DESKTOP_SMOKE_DIR: output };
 delete env.ELECTRON_RUN_AS_NODE;
-const child = spawn(require('electron'), [root], { cwd: root, env, windowsHide: true, stdio: 'pipe' });
+// Exercise the CI host setting locally too; the harness owns its media baseline.
+const child = spawn(require('electron'), [root, '--force-prefers-reduced-motion'], { cwd: root, env, windowsHide: true, stdio: 'pipe' });
 let diagnostics = '';
 for (const stream of [child.stdout, child.stderr]) stream.on('data', chunk => { diagnostics = (diagnostics + chunk).slice(-6000); });
 const timer = setTimeout(() => { child.kill(); console.error('Desktop-Test hat nicht rechtzeitig beendet.'); process.exitCode = 1; }, 90000);
