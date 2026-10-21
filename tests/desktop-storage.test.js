@@ -1,0 +1,38 @@
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { prepareStorage } = require('../electron/storage.cjs');
+const { createApp } = require('../server');
+
+test('desktop seeds missing files, preserves progress and serves assets outside writable data', async t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'ticket-desktop-storage-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const assetsRoot = path.join(directory, 'resources'), root = path.join(directory, 'portable');
+  fs.mkdirSync(path.join(assetsRoot, 'stats'), { recursive: true });
+  fs.mkdirSync(path.join(assetsRoot, 'ui'));
+  fs.writeFileSync(path.join(assetsRoot, 'AGENTS.md'), 'Simulationsregeln');
+  fs.writeFileSync(path.join(assetsRoot, 'stats', 'karriere.md'), '| Aktuelles Level | 3 |');
+  fs.writeFileSync(path.join(assetsRoot, 'stats', 'speedrun.md'), '# Highscores');
+  fs.writeFileSync(path.join(assetsRoot, 'ui', 'index.html'), '<title>Desktop assets</title>');
+  prepareStorage({ assetsRoot, root });
+  fs.writeFileSync(path.join(root, 'stats', 'karriere.md'), '| Aktuelles Level | 5 |');
+  fs.mkdirSync(path.join(root, '.sim'));
+  const saved = JSON.stringify({ version: 1, model: 'gpt-6-luna', session: null, archives: [], environment: 'Bestehende Umgebung' });
+  fs.writeFileSync(path.join(root, '.sim', 'ui-state.json'), saved);
+  prepareStorage({ assetsRoot, root });
+  assert.equal(fs.readFileSync(path.join(root, '.sim', 'ui-state.json'), 'utf8'), saved);
+  assert.equal(fs.readFileSync(path.join(root, 'stats', 'karriere.md'), 'utf8'), '| Aktuelles Level | 5 |');
+  const desktop = createApp({ root, assetsRoot, authCheck: async () => ({ available: false, reason: 'Test' }) });
+  await new Promise(resolve => desktop.server.listen(0, '127.0.0.1', resolve));
+  t.after(() => desktop.close());
+  const base = `http://127.0.0.1:${desktop.server.address().port}`;
+  assert.equal(await (await fetch(base)).text(), '<title>Desktop assets</title>');
+  const { token } = await (await fetch(`${base}/api/bootstrap`)).json();
+  const state = await (await fetch(`${base}/api/state`, { headers: { 'X-Sim-Token': token } })).json();
+  assert.equal(state.level, 1);
+  assert.equal(state.game.ranked.rr, 0);
+  assert.equal(fs.readFileSync(path.join(root, 'stats', 'karriere.md'), 'utf8'), '| Aktuelles Level | 5 |');
+});

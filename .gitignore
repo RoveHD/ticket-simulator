@@ -3,3 +3,9 @@ dist/
 codex/
 .codex-home/
 codex-download.zip
+.sim/ui-state.json
+.sim/ui-state.json.*
+.sim/ui-state.*.tmp
+.sim/backups/
+output/
+node_modules/

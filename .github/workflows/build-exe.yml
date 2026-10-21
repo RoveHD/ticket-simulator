@@ -4,7 +4,7 @@ on:
   push:
     branches: ['**']
     tags: ['v*']
-    paths: ['sim.js', 'AGENTS.md', 'README.md', 'stats/*.md', 'build/**', '.github/workflows/build-exe.yml']
+    paths: ['sim.js', 'launch.js', 'package*.json', 'electron/**', 'assets/**', 'server/**', 'ui/**', 'tests/**', 'AGENTS.md', 'README.md', 'stats/*.md', 'build/**', '.github/workflows/build-exe.yml']
   workflow_dispatch:
     inputs:
       version:
@@ -22,6 +22,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: npm ci
+      - run: npm test
+      - run: npm run test:desktop
       - run: node build/build-exe.js win
       - run: Compress-Archive -Path dist/TicketSimulator.exe -DestinationPath dist/TicketSimulator.zip
       - uses: actions/upload-artifact@v4

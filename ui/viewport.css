@@ -1,0 +1,138 @@
+/* Keep navigation and the application frame in view; long pages scroll inside main. */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#play-header {
+  flex: 0 0 auto;
+}
+
+.app-shell {
+  flex: 1 1 0;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.main-shell {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.main-shell > main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.topbar,
+.footer {
+  flex: 0 0 auto;
+}
+
+.start-screen {
+  min-height: 100%;
+  height: auto;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.menu-stage{padding:24px 0;min-height:0}
+
+@media (min-width: 691px) and (max-width: 1180px) {
+  .menu-stage {
+    grid-template-columns: minmax(280px, .95fr) minmax(0, 1.05fr);
+    gap: clamp(20px, 3vw, 38px);
+    padding: 20px 0;
+    min-height: 0;
+  }
+
+  .menu-copy .menu-title {
+    font-size: clamp(36px, 5vw, 60px);
+    letter-spacing: -2.6px;
+  }
+
+  .menu-edition {
+    margin-bottom: 15px;
+  }
+
+  .menu-tagline {
+    margin-bottom: 20px;
+    font-size: 17px;
+  }
+
+  .menu-play,
+  .menu-choice {
+    min-height: 68px;
+    padding: 11px 14px;
+  }
+
+  .menu-world > .menu-network {
+    max-height: 37vh;
+  }
+
+  .menu-footer {
+    padding-top: 10px;
+  }
+}
+
+@media(max-height:800px) and (min-width:691px){
+  .start-screen{padding-top:18px;padding-bottom:16px}
+  .menu-header{padding-bottom:14px}
+  .menu-stage{padding:18px 0}
+  .menu-copy .menu-title{font-size:clamp(30px,4.2vw,60px);margin-bottom:16px}
+  .menu-edition{margin-bottom:14px;font-size:9px;letter-spacing:1.2px}
+  .menu-tagline{font-size:16px;margin-bottom:18px}
+  .menu-play,.menu-choice{min-height:60px;padding:9px 12px;font-size:16px;gap:12px}
+  .menu-choice{margin-top:12px}
+  .menu-secondary{margin-top:12px;gap:8px}
+  .menu-secondary>button{padding:11px 8px;flex-basis:110px}
+  .menu-workspace{padding-top:13px}
+  .menu-world>.menu-network{max-height:28vh}
+  .menu-rank{padding:10px 0;gap:12px}
+  .menu-rank>.grand-rank{width:64px;height:74px}
+  .menu-rank strong{font-size:15px}
+  .menu-companion{top:45px;right:8px;padding:9px;gap:9px;font-size:13px}
+  .menu-companion .progression-avatar.avatar-large{width:44px;height:52px}
+  .menu-footer{padding-top:12px;font-size:9px}
+}
+
+@media (max-width: 690px) {
+  .app-shell {
+    margin-bottom: 65px;
+  }
+
+  body[data-screen="menu"] .app-shell {
+    margin-bottom: 0;
+  }
+
+  .main-shell {
+    padding-bottom: 0;
+  }
+}
+
+@media(max-height:700px) and (min-width:691px){
+  .menu-tagline{display:none}
+  .menu-copy .menu-title{margin-bottom:18px;font-size:clamp(30px,4vw,50px)}
+  .menu-edition{margin-bottom:12px}
+  .menu-stage{padding:16px 0}
+  .menu-secondary>button{padding:9px 8px}
+}
+
+@media(max-width:950px){
+  .play-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:100%;overflow:visible;gap:2px}
+  .play-tabs button{min-width:0;padding:9px 4px;font-size:12px;white-space:normal}
+}
+@media(max-width:690px){.play-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}}

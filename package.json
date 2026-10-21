@@ -1,0 +1,53 @@
+{
+  "name": "ticket-simulator",
+  "version": "1.6.0",
+  "private": true,
+  "main": "electron/main.cjs",
+  "author": "RoveHD",
+  "description": "Lokaler IT-Trainingsplatz mit integrierter ChatGPT-Anbindung",
+  "scripts": {
+    "start": "node launch.js",
+    "start:cli": "node sim.js",
+    "test": "node --test tests/*.test.js",
+    "build": "node build/build-exe.js",
+    "test:desktop": "node tests/desktop-smoke.cjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "electron": "44.3.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.rovehd.ticketsimulator",
+    "productName": "Ticket Simulator",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "electron/**",
+      "server/**",
+      "ui/**",
+      "assets/**",
+      "AGENTS.md",
+      "stats/karriere.md",
+      "stats/speedrun.md",
+      "package.json",
+      "README.md"
+    ],
+    "asar": true,
+    "compression": "store",
+    "win": {
+      "target": [
+        "portable"
+      ],
+      "icon": "assets/icon.ico",
+      "signExecutable": false
+    },
+    "portable": {
+      "artifactName": "TicketSimulator-${version}.exe"
+    }
+  }
+}

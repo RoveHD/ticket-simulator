@@ -1,0 +1,58 @@
+/* One emblem per career rank, using the same badges as the live rank display. */
+.rank-gallery{max-width:1320px;margin:0 auto;color:var(--ink)}
+.rank-gallery-top{display:flex;align-items:center;justify-content:space-between;gap:16px;color:var(--muted);font:10px Consolas,monospace;letter-spacing:1.5px}
+.rank-gallery-top .text-button{display:flex;gap:10px;align-items:center;font-size:12px;letter-spacing:0}
+.rank-gallery-heading{text-align:center;margin:26px auto 34px;max-width:700px}
+.rank-gallery-heading .eyebrow{color:var(--green);font:10px Consolas,monospace;letter-spacing:3px}
+.rank-gallery-heading h1{font-size:clamp(30px,3.6vw,54px);font-weight:850;letter-spacing:-1.5px;line-height:1.1;margin:12px 0 16px}
+.rank-gallery-heading p{font-size:15px;line-height:1.7;color:var(--muted);margin:0}
+.rank-lineup{list-style:none;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));padding:0;margin:0;gap:16px}
+.rank-tier{--rank-color:#8793a2;min-width:0;position:relative;text-align:center;border-top:1px solid var(--line);border-bottom:2px solid var(--line);padding:17px 7px 18px}
+.rank-tier:nth-child(2){--rank-color:#63d1b7}.rank-tier:nth-child(3){--rank-color:#6fbdff}.rank-tier:nth-child(4){--rank-color:#c696ff}.rank-tier:nth-child(5){--rank-color:#ffb35d}.rank-tier:nth-child(6){--rank-color:#ffe17b}
+.rank-tier-number{font:10px Consolas,monospace;letter-spacing:2px;color:var(--rank-color)}
+.rank-tier-emblem{height:155px;display:grid;place-items:center;margin:18px 0 10px}
+.rank-tier-emblem .grand-rank{width:120px;height:135px;max-width:100%}
+.rank-tier-emblem .grand-rank strong{font-size:19px;margin-top:23px}
+.rank-tier-emblem .grand-rank small{display:none}
+.rank-tier-emblem .rank-stars{top:0}
+.rank-tier h2{font-size:15px;line-height:1.5;margin:0;min-height:68px;display:flex;align-items:center;justify-content:center;overflow-wrap:anywhere;hyphens:auto}
+.rank-tier-threshold{display:block;font:10px Consolas,monospace;letter-spacing:.3px;color:var(--muted);margin:12px 0 17px}
+.rank-tier-state{font:9px Consolas,monospace;letter-spacing:.5px;color:var(--muted)}
+.rank-tier.is-current{border-color:var(--rank-color);background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--rank-color) 7%,transparent))}
+.rank-tier.is-current .rank-tier-state{color:var(--rank-color);font-weight:700}
+.rank-tier.is-current:before{content:'';position:absolute;top:-3px;left:calc(50% - 3px);width:6px;height:6px;background:var(--rank-color);transform:rotate(45deg)}
+.rank-current{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center;padding:26px 0;margin-top:25px;border-bottom:1px solid var(--line)}
+.rank-current .eyebrow{font:10px Consolas,monospace;letter-spacing:1.5px;color:var(--muted)}
+.rank-current h2{font-size:23px;line-height:1.3;margin:8px 0;color:var(--ink)}
+.rank-current p{font-size:13px;line-height:1.6;margin:0;color:var(--muted)}
+.rank-current-meter>div{display:flex;justify-content:space-between;align-items:baseline;gap:15px;margin-bottom:14px}
+.rank-current-meter strong{font:700 28px Consolas,monospace;color:var(--green)}
+.rank-current-meter strong small{font-size:13px;font-weight:400;color:var(--muted)}
+.rank-current-meter>div>span,.rank-current-meter>small{font:10px Consolas,monospace;color:var(--muted)}
+.rank-current-meter progress{display:block;width:100%;height:5px;margin-bottom:12px;accent-color:var(--green)}
+.rank-gallery-rules{display:grid;grid-template-columns:1fr 1fr;gap:36px;padding:24px 0 0}
+.rank-gallery-rules p{font-size:13px;line-height:1.75;color:var(--muted);margin:0}
+.rank-gallery-rules strong{display:block;font-weight:650;color:var(--ink)}
+button.menu-rank{width:100%;color:inherit;text-align:left;background:transparent;border-left:0;border-right:0;cursor:pointer;font:inherit;border-radius:0}
+button.menu-rank:hover{background:#18274266}
+button.menu-rank:focus-visible{outline:2px solid var(--green);outline-offset:5px}
+.menu-rank-hint{grid-column:2/-1;font:10px Consolas,monospace;color:var(--green);margin-top:-8px}
+.rank-overview-link{display:flex;align-items:center;gap:10px;margin:-5px 0 26px}
+body[data-screen="ranks"] main{padding-top:24px;padding-bottom:24px}
+.rank-gallery-heading{margin:16px auto 22px}
+.rank-gallery-heading h1{font-size:clamp(30px,3vw,42px);margin:9px 0 12px}
+.rank-tier-emblem{height:120px;margin:12px 0 6px}
+.rank-tier-emblem .grand-rank{width:108px;height:120px}
+.rank-tier{padding-top:12px;padding-bottom:14px}
+.rank-tier h2{min-height:50px}
+.rank-tier-threshold{margin:10px 0 12px}
+.rank-current{padding:18px 0;margin-top:15px}
+.rank-gallery-info{padding-top:15px;color:var(--muted);font-size:12px}
+.rank-gallery-info summary{display:flex;align-items:center;gap:8px;width:fit-content;cursor:pointer;list-style:none}
+.rank-gallery-info summary::-webkit-details-marker{display:none}
+.rank-gallery-info summary .icon{width:14px;height:14px;transition:transform .15s}
+.rank-gallery-info[open] summary .icon{transform:rotate(90deg)}
+@media(max-width:1250px){.rank-lineup{gap:9px}.rank-tier{padding-left:4px;padding-right:4px}.rank-tier-emblem{height:130px;margin:14px 0 6px}.rank-tier-emblem .grand-rank{width:100px;height:115px}.rank-tier h2{font-size:13px}.rank-tier-threshold{font-size:9px}}
+@media(max-width:1000px){.rank-lineup{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 15px}.rank-tier-emblem{height:100px;margin:10px 0 5px}.rank-tier-emblem .grand-rank{width:83px;height:98px}.rank-tier-emblem .grand-rank strong{font-size:15px;margin-top:16px}.rank-tier h2{min-height:42px}.rank-tier-threshold{margin:8px 0 12px}.rank-gallery-heading{margin:22px auto 26px}.rank-current{gap:22px}.rank-current h2{font-size:20px}.rank-gallery-rules{gap:22px}}
+@media(max-width:650px){.rank-gallery-top>span{display:none}.rank-current,.rank-gallery-rules{grid-template-columns:1fr;gap:20px}.rank-gallery-heading h1{font-size:29px}.rank-gallery-heading p{font-size:13px}.rank-lineup{gap:16px 8px}.rank-tier h2{font-size:12px;min-height:54px}.rank-tier-number,.rank-tier-threshold,.rank-tier-state{font-size:8px;letter-spacing:0}}
+@media(max-height:800px) and (min-width:1001px){.rank-gallery-heading{margin:18px auto 22px}.rank-gallery-heading h1{font-size:36px;margin:9px 0 12px}.rank-tier-emblem{height:115px;margin:10px 0 5px}.rank-tier-emblem .grand-rank{width:100px;height:112px}.rank-tier{padding-top:12px;padding-bottom:12px}.rank-tier h2{min-height:50px}.rank-tier-threshold{margin:10px 0 12px}.rank-current{padding:18px 0;margin-top:15px}.rank-gallery-rules{padding-top:18px}}
