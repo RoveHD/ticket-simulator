@@ -62,6 +62,7 @@ async function start() {
     webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webviewTag: false, spellcheck: false, backgroundThrottling: !smoke },
   });
   Menu.setApplicationMenu(null);
+  if (smoke) require('../tests/strict-csp.cjs')(win.webContents, origin);
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   win.webContents.on('will-navigate', (event, url) => {
     if (new URL(url).origin !== origin) event.preventDefault();
@@ -69,7 +70,8 @@ async function start() {
   win.webContents.on('will-attach-webview', event => event.preventDefault());
   win.webContents.session.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
   win.webContents.session.setPermissionCheckHandler(() => false);
-  win.webContents.on('console-message', (_event, details) => {
+  win.webContents.on('console-message', details => {
+    if (smoke && require('../tests/strict-csp.cjs').isBlockedExternalInjection(details.message)) return;
     if (details.level === 'error') rendererErrors.push(details.message);
   });
   win.once('closed', () => { win = null; });

@@ -28,7 +28,9 @@ app.whenReady().then(async () => {
       if (result?.error) throw Error(result.error);
       return result;
     };
-    await win.loadURL(`http://127.0.0.1:${backend.server.address().port}`);
+    const origin = `http://127.0.0.1:${backend.server.address().port}`;
+    require('./strict-csp.cjs')(win.webContents, origin);
+    await win.loadURL(origin);
     await run(`await new Promise((resolve,reject)=>{
       const check=()=>{if(state?.game){observer.disconnect();clearTimeout(timer);resolve();}};
       const observer=new MutationObserver(check);observer.observe(document.body,{childList:true,subtree:true});

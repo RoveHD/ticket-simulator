@@ -1,5 +1,7 @@
 ## Ticket Simulator – Windows-Desktop-App
 
+**Neu in 1.7.7:** Gespeicherte Glücksradpositionen, kosmetische Partikel, Ergebnisanimationen und der XP-Balken funktionieren ohne Inline-Stilattribute. Alle 15 gewichteten Gewinnpositionen werden auch nach Neuladen korrekt angezeigt. Die Desktop-Prüfungen erzwingen die Projekt-Sicherheitsrichtlinie unabhängig von lokal veränderten HTTP-Headern. Navigation, Begleiterbilder und alle unten beschriebenen Erweiterungen sind enthalten.
+
 **Neu in 1.7.6:** Pixelporträts verwenden feste Atlas-Koordinaten in der CSS-Datei. Damit funktioniert ihre Darstellung auch bei blockierten Inline-Stilen unter der unveränderten Sicherheitsrichtlinie. Der Desktop-Test meldet fehlende Atlas-Koordinaten direkt, bevor er die Bildtransparenz prüft. Alle folgenden Erweiterungen und Oberflächenkorrekturen sind enthalten.
 
 **Neu in 1.7.5:** Die obere Navigation bündelt alle Ziele in sechs übersichtlichen Hauptpunkten. Spielen, Fortschritt und Auswertung öffnen Untermenüs mit kurzen Erklärungen; Leitstelle, Casino und Optionen bleiben direkt erreichbar. Die aktuelle Seite ist in ihrer Gruppe markiert. Tastaturbedienung, Escape und das Schließen per Klick außerhalb sind integriert. Begleiterbilder in der Wechselansicht besitzen wieder einen eigenen, proportionalen Vorschaubereich und werden nicht mehr als flache Streifen dargestellt.

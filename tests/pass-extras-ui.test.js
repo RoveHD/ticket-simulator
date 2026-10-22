@@ -8,7 +8,8 @@ function renderer(game = progression([])) {
   const events = {}, nodes = [], animations = [];
   let reduced = false, time = 0;
   function node() {
-    return { dataset: {}, style: {}, setAttribute() {}, remove() { this.removed = true; },
+    return { dataset: {}, style: { setProperty(name,value) { this[name]=value; } }, setAttribute() {}, remove() { this.removed = true; },
+      querySelectorAll(selector) { return selector === '.finisher-particle' ? (this.particles ||= Array.from({length:24},()=>({style:{setProperty(name,value){this[name]=value;}}}))) : []; },
       getAnimations() { return this.animations || []; },
       animate() { const animation = { finished: new Promise(() => {}), cancel() { this.cancelled = true; } };
         (this.animations ||= []).push(animation); animations.push(animation); return animation; } };
@@ -39,6 +40,10 @@ test('all eighty pass rewards render with distinct bonus previews and locked cos
   for(const reward of BONUS_CATALOG) {
     const art=ui.run('passExtraArt(input)',reward);
     assert.ok(art.includes('extra-'+reward.kind));
+    assert.doesNotMatch(art,/<i\s+style=/);
+    if(['aura','trail','finisher'].includes(reward.kind)) {
+      assert.equal((art.match(/class="extra-particle-\d+"/g)||[]).length,8);
+    }
   }
   const art=ui.run('passExtraArt(input)',{kind:'scene',variant:'1" onclick=alert(1)',name:'<img src=x>'});
   assert.doesNotMatch(art,/<img|onclick=/);assert.match(art,/&lt;img/);
@@ -77,6 +82,10 @@ test('victory finishers run only for a new successful completion and previews ne
   ui.run('state.session={id:"case-a",status:"completed"}');ui.mount();assert.equal(ui.live.length,0);
   ui.run('state.session={id:"case-b",status:"active"};state.game.latest.id="case-b"');ui.mount();
   ui.run('state.session.status="completed"');ui.mount();assert.equal(ui.live.length,1);
+  assert.doesNotMatch(ui.live[0].innerHTML,/<i\s+style=/);
+  assert.equal(ui.live[0].particles.length,24);
+  assert.deepEqual(ui.live[0].particles.map(p=>[p.style['--i'],p.style['--x'],p.style['--drift']]).slice(0,3),
+    [['0','0%','-35px'],['1','37%','40px'],['2','74%','-45px']]);
   ui.mount();assert.equal(ui.live.length,1);
   const before=ui.run('JSON.stringify(state)');
   for(let i=0;i<50;i++)ui.api.burst(4,true);

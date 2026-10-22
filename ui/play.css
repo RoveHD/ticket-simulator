@@ -49,3 +49,26 @@ body:not([data-screen="menu"]) #main>.mission-heading,body:not([data-screen="men
 @media(max-width:1300px){#play-header .play-tabs{order:3;flex-basis:100%;width:100%}}
 @media(max-width:950px){#play-header .play-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}#play-header .play-nav-group{min-width:0}#play-header .play-nav-toggle{width:100%}#play-header .play-tabs>button,#play-header .play-nav-toggle{font-size:11px;padding:10px 4px}}
 @media(prefers-reduced-motion:reduce){.play-nav-chevron{transition:none}}
+
+/* Authored particle positions and difficulty colors work under style-src self. */
+.level-pick{--danger:#ac91ff}.level-pick.high-danger{--danger:#f19d78}
+.result-particles>i:nth-child(1){--n:0;--x:0%;--drift:-30px}
+.result-particles>i:nth-child(2){--n:1;--x:37%;--drift:39px}
+.result-particles>i:nth-child(3){--n:2;--x:74%;--drift:-48px}
+.result-particles>i:nth-child(4){--n:3;--x:11%;--drift:57px}
+.result-particles>i:nth-child(5){--n:4;--x:48%;--drift:-66px}
+.result-particles>i:nth-child(6){--n:5;--x:85%;--drift:75px}
+.result-particles>i:nth-child(7){--n:6;--x:22%;--drift:-84px}
+.result-particles>i:nth-child(8){--n:7;--x:59%;--drift:93px}
+.result-particles>i:nth-child(9){--n:8;--x:96%;--drift:-102px}
+.result-particles>i:nth-child(10){--n:9;--x:33%;--drift:111px}
+.result-particles>i:nth-child(11){--n:10;--x:70%;--drift:-120px}
+.result-particles>i:nth-child(12){--n:11;--x:7%;--drift:129px}
+.result-particles>i:nth-child(13){--n:12;--x:44%;--drift:-138px}
+.result-particles>i:nth-child(14){--n:13;--x:81%;--drift:147px}
+.result-particles>i:nth-child(15){--n:14;--x:18%;--drift:-156px}
+.result-particles>i:nth-child(16){--n:15;--x:55%;--drift:165px}
+.result-particles>i:nth-child(17){--n:16;--x:92%;--drift:-174px}
+.result-particles>i:nth-child(18){--n:17;--x:29%;--drift:183px}
+.result-particles>i:nth-child(19){--n:18;--x:66%;--drift:-192px}
+.result-particles>i:nth-child(20){--n:19;--x:3%;--drift:201px}

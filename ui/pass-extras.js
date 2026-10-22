@@ -23,7 +23,7 @@ function passExtraArt(reward, compact = false) {
   if (!Object.hasOwn(passExtraLabels, kind) && kind !== 'currency') return '';
   const art = kind === 'scene' || kind === 'banner' ? passExtraScene(variant)
     : kind === 'currency' ? `<span class="extra-dust-symbol" aria-hidden="true">✧</span><strong>${Number(reward.amount) || 0}</strong>`
-    : `<span class="extra-core" aria-hidden="true">${passExtraSymbols[kind]}</span>${Array.from({length:8},(_,i)=>`<i style="--i:${i}" aria-hidden="true"></i>`).join('')}`;
+    : `<span class="extra-core" aria-hidden="true">${passExtraSymbols[kind]}</span>${Array.from({length:8},(_,i)=>`<i class="extra-particle-${i}" aria-hidden="true"></i>`).join('')}`;
   return `<div class="progression-art pass-extra-art extra-${kind} extra-tone-${variant} ${compact ? 'compact' : ''}" role="img" aria-label="${progressionEscape(reward.name)}">${art}<span class="extra-art-label">${kind === 'currency' ? 'ARKANSTAUB' : progressionEscape(passExtraLabels[kind])}</span></div>`;
 }
 function passExtraBanner() {
@@ -59,7 +59,12 @@ function passExtrasCollection() {
     layer.className = `pass-finisher-layer extra-tone-${variant} finisher-${variant}`;
     layer.setAttribute('aria-hidden', 'true');
     const names = ['STERNENREGEN', 'RUNENEXPLOSION', 'PHÖNIX-AUFSTIEG', 'WELTENRISS', 'ARKANE SUPERNOVA'];
-    layer.innerHTML = `<span class="finisher-flash"></span><span class="finisher-rune">${['✦','◇','ϟ','✧','✺'][variant-1]}</span><strong>${preview ? 'VORSCHAU · ' : ''}${names[variant-1]}</strong>${Array.from({length:24},(_,i)=>`<i style="--i:${i};--x:${(i*37)%100}%;--drift:${(i%2?1:-1)*(35+i*5)}px"></i>`).join('')}`;
+    layer.innerHTML = `<span class="finisher-flash"></span><span class="finisher-rune">${['✦','◇','ϟ','✧','✺'][variant-1]}</span><strong>${preview ? 'VORSCHAU · ' : ''}${names[variant-1]}</strong>${Array.from({length:24},(_,i)=>`<i class="finisher-particle finisher-particle-${i}"></i>`).join('')}`;
+    for(const [i,particle] of layer.querySelectorAll('.finisher-particle').entries()) {
+      particle.style.setProperty('--i',String(i));
+      particle.style.setProperty('--x',`${(i*37)%100}%`);
+      particle.style.setProperty('--drift',`${(i%2?1:-1)*(35+i*5)}px`);
+    }
     document.body.append(layer); finishLayer = layer;
     const animation = layer.animate([{opacity:0},{opacity:1,offset:.12},{opacity:1,offset:.65},{opacity:0}], {duration:2000,easing:'ease-out'});
     animation.finished.catch(()=>{}).finally(()=>{ layer.remove(); if(finishLayer===layer)finishLayer=null; });
@@ -101,7 +106,7 @@ function passExtrasCollection() {
       if(!selected.aura) {old?.remove();continue;}
       if(old?.dataset.rewardId===selected.aura.id)continue;
       old?.remove(); const aura=document.createElement('span');aura.className=`pass-companion-aura extra-tone-${passExtraVariant(selected.aura)}`;aura.dataset.rewardId=selected.aura.id;aura.setAttribute('aria-hidden','true');
-      aura.innerHTML=Array.from({length:8},(_,i)=>`<i style="--i:${i}"></i>`).join('');avatar.append(aura);
+      aura.innerHTML=Array.from({length:8},(_,i)=>`<i class="aura-particle-${i}"></i>`).join('');avatar.append(aura);
     }
     const session=state?.session;
     if(finisher && session?.status==='completed' && previousId===session.id && previousStatus==='active' && state.game?.latest?.id===session.id && state.game.latest.solved && currentView==='simulation')burst(passExtraVariant(finisher));

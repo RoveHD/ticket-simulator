@@ -35,6 +35,15 @@ test('grouped navigation keeps all destinations and marks the current destinatio
   }
 });
 
+test('model input pattern is valid with modern HTML Unicode-set validation', () => {
+  const run = ui();
+  const html = run('state={model:"gpt-6-luna",audio:{},game:{}};settings()');
+  const pattern = html.match(/name="model"[^>]*pattern="([^"]+)"/)[1];
+  const valid = new RegExp(`^(?:${pattern})$`, 'v');
+  for (const model of ['gpt-6-luna', 'model:local_v2.1', 'a']) assert.ok(valid.test(model));
+  for (const model of ['', 'bad model', '/escape', '<script>', 'x'.repeat(101)]) assert.ok(!valid.test(model));
+});
+
 test('passive ticket assistance renders automatically from the draft without altering the session', () => {
   const run = ui();
   run('state={session:{status:"active",ticket:{number:"1001",title:"Dienst ausgefallen"},messages:[]},game:{characters:[{id:"dragon"}],companion:{activeId:"dragon"}}};draft="Restart-Computer -ComputerName DC01"');
