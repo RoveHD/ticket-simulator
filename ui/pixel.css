@@ -101,7 +101,12 @@ progress::-webkit-progress-bar{background:#11101f}progress::-webkit-progress-val
 @media(prefers-reduced-motion:reduce){.rank-current-meter progress::-webkit-progress-value,progress::-webkit-progress-value{transition:none}.result-animate{animation:none}}
 
 /* Pixel sprites are cropped in CSS; the generated atlas files stay intact. */
-:root body .pixel-sprite{display:block;position:relative;overflow:hidden;width:100%;height:100%;min-width:0;flex:none;image-rendering:pixelated;pointer-events:none}
+/* Static atlas coordinates also work when CSP blocks inline style attributes. */
+:root body .pixel-sprite{--sprite-col:0;--sprite-row:0;--sprite-rows:2;display:block;position:relative;overflow:hidden;width:100%;height:100%;min-width:0;flex:none;image-rendering:pixelated;pointer-events:none}
+:root body .pixel-sprite:is([data-character="wolf"],[data-character="snake-coral"],[data-character="wolf-night"],[data-character="dragon-frost"]){--sprite-col:1}
+:root body .pixel-sprite[data-variant="lord"]{--sprite-row:1}
+:root body .pixel-sprite[data-character="chimera"]{--sprite-col:0;--sprite-row:0;--sprite-rows:1}
+:root body .pixel-sprite[data-character="chimera"][data-variant="lord"]{--sprite-col:1}
 :root body .pixel-sprite>img.pixel-sprite-sheet{position:absolute;inset:auto;left:calc(var(--sprite-col)*-100%);top:calc(var(--sprite-row)*-100%);width:200%;height:calc(var(--sprite-rows)*100%);max-width:none;max-height:none;margin:0;object-fit:fill;object-position:initial;image-rendering:pixelated;animation:none;transform:none;filter:none;opacity:1;pointer-events:none}
 :root body .mastery-animal>.pixel-sprite{width:52px;height:64px;margin:0 auto 9px}
 :root body .companion-choice-art>.pixel-sprite{width:100%;height:100%;position:absolute;inset:0}

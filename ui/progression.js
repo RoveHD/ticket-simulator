@@ -66,12 +66,11 @@ function progressionCharacterImage(id, lord = false) {
 }
 function progressionPixelSprite(id, lord = false, extraClass = '') {
   if (progressionSecretLocked(id)) return '';
-  const cells = { snake:['a',0],wolf:['a',1],dragon:['b',0],'snake-coral':['b',1],fox:['c',0],
-    'wolf-night':['c',1],raven:['d',0],'dragon-frost':['d',1],chimera:['secret',0] };
+  const cells = { snake:'a',wolf:'a',dragon:'b','snake-coral':'b',fox:'c',
+    'wolf-night':'c',raven:'d','dragon-frost':'d',chimera:'secret' };
   if (!Object.hasOwn(cells,id) || !progressionCharacterById(id)) return '';
-  const [sheet,column] = cells[id], secret = sheet === 'secret';
-  const col = secret ? Number(lord) : column, row = secret ? 0 : Number(lord), rows = secret ? 1 : 2;
-  return `<span class="pixel-sprite ${extraClass}" data-character="${id}" data-variant="${lord ? 'lord' : 'base'}" style="--sprite-col:${col};--sprite-row:${row};--sprite-rows:${rows}"><img class="pixel-sprite-sheet" src="/characters/pixel-atlas-${sheet}.png" alt="" loading="lazy" draggable="false"></span>`;
+  const sheet = cells[id];
+  return `<span class="pixel-sprite ${extraClass}" data-character="${id}" data-variant="${lord ? 'lord' : 'base'}"><img class="pixel-sprite-sheet" src="/characters/pixel-atlas-${sheet}.png" alt="" loading="lazy" draggable="false"></span>`;
 }
 function progressionCompanionForms(characterId) { return progressionGame().companionForms?.[characterId]; }
 function progressionPersonalMasteries(characterId) {

@@ -37,6 +37,17 @@ test('missions, battlepass, mastery and profile have independent navigation dest
   assert.match(run('mainMenu()'), /class="profile-quick"[^>]*data-view="profile"/);
 });
 
+test('pixel portraits do not require inline styles for their atlas coordinates', () => {
+  const run = renderer();
+  for (const id of ['snake','wolf','dragon','snake-coral','fox','wolf-night','raven','dragon-frost']) {
+    for (const lord of [false,true]) {
+      const html = run(`progressionPixelSprite('${id}',${lord})`);
+      assert.match(html, new RegExp(`data-character="${id}" data-variant="${lord ? 'lord' : 'base'}"`));
+      assert.doesNotMatch(html, /\bstyle=/);
+    }
+  }
+});
+
 test('profile defaults to companions, explains level lock and permits selection after max level', () => {
   const run = renderer();
   assert.match(run('companionProfile()'), /data-profile-tab="companions" aria-current="page"/);

@@ -60,12 +60,14 @@ app.whenReady().then(async () => {
             if(!creature||!bg)throw Error('Separate layers missing: ${id}/${tier}');
             const canvas=document.createElement('canvas');canvas.width=100;canvas.height=100;
             const sheet=creature.querySelector('img'),css=getComputedStyle(creature);
-        const col=Number(css.getPropertyValue('--sprite-col')),row=Number(css.getPropertyValue('--sprite-row')),rows=Number(css.getPropertyValue('--sprite-rows'));
+        const rawCoordinates=['--sprite-col','--sprite-row','--sprite-rows'].map(name=>css.getPropertyValue(name).trim());
+        const [col,row,rows]=rawCoordinates.map(Number);
+        if(rawCoordinates.some(value=>value==='')||![col,row,rows].every(Number.isInteger)||col<0||col>1||rows<1||row<0||row>=rows||!sheet.naturalWidth||!sheet.naturalHeight)throw Error('Invalid portrait atlas coordinates: ${id}/${tier} '+JSON.stringify({rawCoordinates,col,row,rows,source:sheet.currentSrc,naturalWidth:sheet.naturalWidth,naturalHeight:sheet.naturalHeight}));
         const cellWidth=sheet.naturalWidth/2,cellHeight=sheet.naturalHeight/rows;
         const ctx=canvas.getContext('2d');ctx.drawImage(sheet,col*cellWidth+cellWidth*.04,row*cellHeight,cellWidth*.92,cellHeight,0,0,100,100);
             const pixels=ctx.getImageData(0,0,100,100).data;let transparent=0,solid=0;
             for(let i=3;i<pixels.length;i+=4){if(pixels[i]===0)transparent++;if(pixels[i]>240)solid++;}
-            if(transparent<1000||solid<1000)throw Error('Missing transparent silhouette: ${id}');
+            if(transparent<1000||solid<1000)throw Error('Missing transparent silhouette: ${id}/${tier} '+JSON.stringify({transparent,solid,width:${width},col,row,rows,source:sheet.currentSrc,naturalWidth:sheet.naturalWidth,naturalHeight:sheet.naturalHeight}));
             if(creature.getBoundingClientRect().top>=frame.getBoundingClientRect().top-8)throw Error('No frame overhang: ${id}');
             if(getComputedStyle(frame).overflowY!=='visible')throw Error('Clipped portrait: ${id}');
             const motion=creature.getAnimations().find(a=>a.animationName.startsWith('creature-'));
