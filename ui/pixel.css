@@ -1,0 +1,230 @@
+/* Ticket Simulator: compact 8-bit arcade cabinet theme. Load after all UI stylesheets. */
+@font-face{font-family:'Pixel Arcade';src:url('/fonts/pixel-arcade.ttf') format('truetype');font-weight:400 900;font-style:normal;font-display:swap}
+:root,:root[data-theme="dark"],:root[data-theme="light"] {
+  --bg:#161329; --paper:#24233e; --ink:#f4e5bf; --muted:#b8b3a5; --line:#514a62;
+  --accent:#e46b59; --accent-hover:#f18467; --sidebar:#100f20; --green:#58b7a1;
+  --soft-green:#263e43; --gold:#e7bc5a; --lift:#302d4b; --radius:0px;
+  --pixel-heading:'Pixel Arcade',Consolas,monospace;
+  color-scheme:dark; font-family:Inter,'Segoe UI',Arial,sans-serif; color:var(--ink); background:var(--bg);
+}
+html,body{background:var(--bg);color:var(--ink)}
+body:not([data-screen="menu"]){background-image:linear-gradient(90deg,#ffffff04 1px,transparent 1px),linear-gradient(#ffffff04 1px,transparent 1px);background-size:32px 32px}
+h1,h2,h3,.brand,.play-brand,.menu-title,.menu-edition,.eyebrow,.nav-label,.play-tabs button,.mission-state,.mission-hud small,.section-head h2,.rank-gallery-heading h1,.rank-tier-number,.progression-overline,.progression-tier-heading h3,.pass-title-art,.result-kicker,.console-title{font-family:var(--pixel-heading)}
+h1{font-size:clamp(23px,2.2vw,31px);line-height:1.45;letter-spacing:0;color:var(--ink)}
+h2{line-height:1.45;letter-spacing:0;color:var(--ink)}
+h3{line-height:1.5;letter-spacing:0;color:var(--ink)}
+p,li,.markdown,.messages,.message,.composer textarea,.queue-ticket h3,.queue-ticket p,.mission p,.mission-terminal,.contact-brief,.report-reader,.rule-list{font-size:16px;line-height:1.7}
+small,.footer,.metric-label,.metric-foot,.mission small,.queue-ticket small,.rank-tier-threshold,.rank-tier-state{font-size:12px;line-height:1.55}
+.sidebar{background:var(--sidebar);color:var(--ink);border-right:3px solid #080812;box-shadow:4px 0 0 #302b46;padding-top:24px}
+.brand,.play-brand{color:var(--gold);font-size:17px;line-height:1.5;letter-spacing:0}
+.brand-symbol,.workspace-icon,.avatar,.tile-icon,.icon-button,.small-badge,.nav-count,.rank-emblem,.debrief-seal,.progression-art,.progression-avatar,.avatar-hero,.avatar-small,.menu-key{border-radius:0!important}
+.brand-symbol{background:var(--accent);border:2px solid #100f20;box-shadow:3px 3px 0 #000;color:var(--ink)}
+.workspace,.menu-workspace{background:var(--paper);border:2px solid var(--line);box-shadow:3px 3px 0 #090814;color:var(--ink)}
+.nav-label{color:var(--gold);font-size:11px;letter-spacing:1px}
+.nav-button{color:#ccc6b8;border:2px solid transparent;border-radius:0;font-size:14px;padding:12px 10px}
+.nav-button:hover,.nav-button.active{background:#302d4b;border-color:#625a73;color:var(--ink);box-shadow:3px 3px 0 #080812}
+.nav-button.active:before{top:6px;bottom:6px;width:4px;background:var(--coral,var(--accent));border-radius:0}
+.nav-count{background:#38334e;border:1px solid var(--gold);color:var(--gold)}
+.nav-divider{background:var(--line);height:2px}
+.profile{border-color:var(--line);color:var(--ink)}
+.main-shell{background:var(--bg)}
+.topbar,#play-header{background:#1c1a31;border-bottom:3px solid #080812;color:var(--ink)}
+.breadcrumb,.breadcrumb strong{color:var(--ink)}.breadcrumb span{color:var(--gold)}
+.connection,.topbar-right{color:var(--muted)}
+main{max-width:1660px}
+.page-heading p,.hero p,.training-card p,.learning-note p,.mission-heading p,.rank-current p,.rank-gallery-heading p{color:var(--muted)}
+.eyebrow{color:var(--gold)!important;font-size:11px;letter-spacing:1px}
+.hero,.metrics,.training-card,.activity-panel,.learning-note,.panel,.command-progress,.mission,.debrief,.queue-board,.queue-idle,.difficulty-card,.mission-hud,.mission-terminal,.companion-ability,.progression-panel,.progression-pass-hero,.progression-hub-hero,.eternal-mastery,.rank-gallery-info,.contact-card,.audio-panel,.report-reader,.case-stamp,.profile-showcase,.profile-customize,.profile-details,.profile-equipped,.profile-cosmetics,.profile-quick,.collection-group,.mission-side,.utility-pick,.level-pick,.mode-pick,.shift-pick,.duration-option,.result-center,.reward-presentation,.queue-ticket{background-color:var(--paper);color:var(--ink);border:2px solid var(--line);border-radius:0;box-shadow:3px 3px 0 #090814}
+.hero{background:linear-gradient(135deg,#24233e,#213d42);border-color:#58b7a1;box-shadow:5px 5px 0 #090814;min-height:265px}
+.hero-copy{padding:32px}.hero h2{font-size:clamp(25px,3vw,38px);color:var(--ink)}.hero-art{background:none;mask-image:none}.art-caption{fill:var(--gold)}
+.metrics{overflow:visible;border-color:var(--gold)}.metric{border-color:var(--line)}.metric-label,.metric-foot{color:var(--muted)}.metric-value{font-family:var(--pixel-heading);font-size:23px;color:var(--gold);letter-spacing:0}
+.training-card{border-top:4px solid var(--green)}.training-card:nth-child(2){border-top-color:var(--accent)}.tile-icon{background:#183d42;color:var(--green);border:1px solid var(--green)}.tile-icon.coral{background:#4a292f;color:#ff9a7f}
+.learning-note{background:#302d4b;border-color:#655a75}.learning-note strong,.section-head>span{color:var(--gold)}
+.button,.text-button,.icon-button,.play-tabs button,.profile-tabs button,.progression-tabs button,.progression-page-controls button,.pass-pagination button,.companion-dock-button,.ability-activate,.report-button,.sound-button,.back-button,.menu-play,.menu-choice,.menu-secondary>button,.launch-shift,.utility-pick,.mode-pick,.level-pick,.shift-pick,.duration-option,.progression-equip,.progression-load-more,.progression-reset,.progression-search button,.queue-ticket .button,.result-actions button{border-radius:0!important}
+.button{min-height:42px;padding:10px 15px;background:#302d4b;border:2px solid #786b80;color:var(--ink);box-shadow:3px 3px 0 #090814;font-weight:700}
+.button:hover{background:#3a3657;border-color:var(--gold);transform:translate(-1px,-1px);box-shadow:4px 4px 0 #090814}
+.button.primary,.menu-play,.launch-shift{background:var(--accent);border:2px solid #ff9a7f;color:#1d1420;box-shadow:4px 4px 0 #090814;font-weight:800}
+.button.primary:hover,.menu-play:hover,.launch-shift:hover{background:#f18467}
+.button.dark{background:#1c1a31;border:2px solid var(--green);color:var(--ink)}.button.ghost,.text-button{color:var(--green)}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+input,textarea,select,.queue-toolbar select,.queue-toolbar input,.progression-search input,.profile-customize input,.form-field input,.form-field select,.form-field textarea{background:#171629!important;color:var(--ink)!important;border:2px solid #635a76!important;border-radius:0!important}
+input::placeholder,textarea::placeholder{color:#a49eae}
+.play-brand{color:var(--gold);font-size:22px}.play-brand span{color:var(--ink)}.play-brand small{color:var(--muted)}
+.play-tabs button{color:var(--muted);font-size:12px}.play-tabs button:hover,.play-tabs button[aria-current]{background:#302d4b;color:var(--gold)}.play-tabs button:after{height:4px;background:var(--gold);border-radius:0}
+.play-profile{color:var(--ink)}
+.menu-stage{gap:clamp(28px,5vw,72px)}.start-screen{background:radial-gradient(ellipse at 76% 48%,#1b5554 0,#17383e 24%,#19162e 57%,#131225 100%);color:var(--ink)}
+.menu-header{border-bottom:2px solid #574f67}.menu-brand{font-family:var(--pixel-heading);color:var(--gold)}.menu-edition{color:var(--green)}
+.menu-title{font-size:clamp(38px,5.5vw,74px)!important;line-height:1.12!important;letter-spacing:0!important;color:var(--ink);text-shadow:4px 4px 0 #090814,7px 7px 0 #e46b59}
+.menu-tagline{font-size:17px;line-height:1.7;color:#d5d2c8}.menu-play,.menu-choice{min-height:67px;padding:13px 17px;font-size:16px}.menu-choice{background:#24233e;border:2px solid #58b7a1;color:var(--ink);box-shadow:4px 4px 0 #090814}.menu-choice:hover{background:#2c4249;border-color:var(--gold)}.menu-secondary>button{background:#24233e;color:var(--ink);border:2px solid #625a73;box-shadow:2px 2px 0 #090814}.menu-footer,.menu-local{color:#c5bfaf}.menu-key{border:1px solid var(--gold);background:#302d4b;color:var(--gold)}
+.menu-world,.menu-network,.network-floor{background-color:#172d38;border-color:#58b7a1}.menu-objective,.menu-status,.menu-rank,.menu-companion{background:#24233e;border:2px solid #6d627a;color:var(--ink);border-radius:0;box-shadow:3px 3px 0 #090814}.menu-rank strong,.menu-rank-number{color:var(--gold)}
+.game-pick{background:#24233e;border:2px solid #625a73;box-shadow:4px 4px 0 #090814}.game-pick:hover:not(:disabled){transform:translate(-2px,-2px);border-color:var(--gold);box-shadow:6px 6px 0 #090814}.game-pick:before{display:none}.selection-burst{border-radius:0;box-shadow:0 0 0 2px var(--gold)}
+.mission-heading h1{font-size:clamp(24px,3vw,37px);letter-spacing:0}.mission-state{border:2px solid var(--green);color:var(--green);font-size:11px;background:#18383b}
+.mission-hud{border-color:#625a73;border-top:4px solid var(--accent);box-shadow:4px 4px 0 #090814}.mission-hud>div{border-color:#514a62}.mission-hud small{color:var(--green)}.mission-hud strong{color:var(--gold)}
+.mission-terminal{border:3px solid var(--green);background:#132c35;box-shadow:5px 5px 0 #090814}.mission-terminal .chat-top{background:#1d3942;border-bottom:2px solid #58b7a1}.mission-terminal .chat-top strong{color:#8ce0c9}.mission-terminal .messages{color:#f4e5bf}.message{border:2px solid #514a62;border-radius:0;background:#282641}.message.user{background:#30413e;border-color:#58b7a1}.composer{background:#201e37;border-top:2px solid #514a62}.composer textarea{font-family:Consolas,monospace;font-size:17px;line-height:1.6}.live-label{color:var(--green)}.markdown{font-size:17px;line-height:1.75}.markdown pre,.markdown code{background:#171629;color:#f0ce82;border-radius:0}
+.command-progress{border-color:var(--gold);box-shadow:4px 4px 0 #090814}.rank-emblem{background:#344a47;color:var(--gold);border-color:var(--gold)}.rank-copy h2{color:var(--ink)}.rank-meter span,.game-stat strong{color:var(--gold)}.game-stat{border-color:#514a62}.mission{border-color:#514a62}.mission.unlocked{border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green),4px 4px 0 #090814}.xp-chip,.rank-up,.reward-unlocks span{color:var(--gold)}
+.debrief{border-left:6px solid var(--accent);border-color:#625a73;animation:debrief-in .35s steps(6,end)}.debrief.won{border-left-color:var(--green)}.debrief-seal{border:2px solid var(--green);color:var(--green)}.debrief-score strong,.debrief-score b{color:var(--gold)}.debrief-score{border-color:#514a62}
+.difficulty-card{border-left:5px solid var(--gold)}.queue-board{border-color:#625a73}.queue-heading h2{color:var(--gold)}.shift-clock strong{color:var(--green)}.queue-ticket{background:transparent;box-shadow:none;border:0;border-top:2px solid #514a62}.queue-ticket.selected{box-shadow:inset 4px 0 var(--green)}.queue-priority,.queue-timing strong{color:var(--gold)}.priority-p1{background:#65302e;color:#ffd1c4}.priority-p2{background:#64451f;color:#ffe0a2}.priority-p3{background:#244842;color:#b9f2dd}.priority-p4{background:#2d394d;color:#d6e7ff}.queue-idle{border-color:var(--green);border-left:5px solid var(--green)}
+.progression-tabs,.profile-tabs{border-bottom:2px solid #514a62}.progression-tabs button,.profile-tabs button{color:var(--muted)}.progression-tabs button[aria-current],.profile-tabs button[aria-current]{color:var(--gold);border-bottom:3px solid var(--gold)}
+.progression-hub,.progression-collection,.profile-heading,.profile-showcase,.profile-equipped,.profile-customize,.profile-details,.profile-cosmetics,.mastery-account,.mastery-companion,.personal-mastery,.companion-profile,.companion-forms,.rank-gallery{color:var(--ink)}
+.progression-panel,.progression-tier,.progression-reward,.progression-mission,.progression-hub-hero,.progression-pass-hero,.progression-mission-grid>.progression-mission,.mastery-account,.mastery-companion,.mastery-badges,.mastery-specialty-art,.mastery-totals,.collection-group,.eternal-mastery,.companion-ability{border:2px solid #514a62!important;border-radius:0!important;box-shadow:3px 3px 0 #090814}
+.progression-tier{background:#1e1c34}.progression-tier.next-tier,.progression-tier.earned{border-color:var(--gold)!important}.progression-tier.earned{border-color:var(--green)!important}.progression-overline,.tier-number,.progression-tier .tier-number{color:var(--gold)}
+.progression-art,.progression-avatar{border-radius:0!important;border:2px solid #85724c;background:#183d42;box-shadow:3px 3px 0 #090814}.progression-art img,.progression-avatar img{image-rendering:auto}
+.progression-count,.progression-rarity,.progression-lock,.progression-empty,.progression-footnote,.progression-result-count,.progression-toolbar,.forms-total{color:var(--muted)}
+.eternal-mastery,.mastery-account,.mastery-companion{background:#211f39!important}.mastery-level,.mastery-bonus-info h3,.mastery-account-title{color:var(--gold)}.mastery-foot,.mastery-requirements{color:var(--muted)}
+.companion-ability{--ability-color:var(--green);background:#1d1b35!important}.ability-heading h3,.passive-heading h3{color:var(--ink)}.ability-symbol{background:#18383b;border-color:var(--green)}.ability-status{color:var(--gold)}.ability-activate{background:#302d4b;color:var(--ink);border:2px solid var(--green);box-shadow:2px 2px 0 #090814}
+.rank-lineup{gap:12px}.rank-tier{border:2px solid #514a62;background:#211f39;box-shadow:3px 3px 0 #090814}.rank-tier.is-current{background:#2c2b41;border-color:var(--gold);box-shadow:inset 0 0 0 2px #e7bc5a55,4px 4px 0 #090814}.rank-tier-number,.rank-tier-state{color:var(--gold)}.rank-current{border-color:#514a62}.rank-current-meter strong{color:var(--green)}.rank-current-meter progress{height:14px;border:2px solid #11101f;background:#11101f;accent-color:var(--green);appearance:none}.rank-current-meter progress::-webkit-progress-bar{background:#11101f}.rank-current-meter progress::-webkit-progress-value{background:repeating-linear-gradient(90deg,var(--green) 0 12px,#183f41 12px 15px);transition:width .3s steps(8,end)}.rank-current-meter progress::-moz-progress-bar{background:repeating-linear-gradient(90deg,var(--green) 0 12px,#183f41 12px 15px)}
+progress,.progression-panel progress,.companion-ability progress,.mastery-progress,.progression-progress-row progress,.rank-meter progress,.shift-meter,.reward-track{appearance:none;height:14px;border:2px solid #11101f;border-radius:0!important;background:#11101f;accent-color:var(--green)}
+progress::-webkit-progress-bar{background:#11101f}progress::-webkit-progress-value{background:repeating-linear-gradient(90deg,var(--green) 0 12px,#183f41 12px 15px);transition:width .3s steps(8,end)}progress::-moz-progress-bar{background:repeating-linear-gradient(90deg,var(--green) 0 12px,#183f41 12px 15px)}
+.rank-meter progress,.shift-meter,.mastery-progress,.progression-panel progress,.companion-ability progress{width:100%}
+.result-screen,.result-center{color:var(--ink)}.result-screen.won,.result-screen.lost{background:#161329}.result-medal,.result-score,.result-progression,.result-rewards,.reward-title{color:var(--gold)}.result-particles{pointer-events:none}.result-animate{animation:result-pop .45s steps(6,end)}
+.notice,.arrival-popup,.toast,.error-panel{background:#292640;color:var(--ink);border:2px solid var(--gold);border-radius:0;box-shadow:4px 4px 0 #090814}.error,.error-panel{border-color:var(--accent)}
+.footer{color:#aaa494;border-top:1px solid #514a62}.footer-separator{color:var(--gold)}
+@keyframes result-pop{0%{transform:translateY(8px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@media(max-width:850px){
+  main{padding:25px clamp(18px,4vw,32px)}.topbar{padding:0 20px}.footer{padding:18px 20px}
+  .mission-stage{grid-template-columns:minmax(0,1fr)}.mission-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .rank-lineup{grid-template-columns:repeat(3,minmax(0,1fr))}.menu-stage{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+}
+@media(max-width:480px){
+  body:not([data-screen="menu"]){background-size:40px 40px}
+  main{padding:18px 14px 16px}.topbar{padding:0 13px}.breadcrumb{font-size:12px}
+  h1{font-size:22px}.page-heading{gap:10px}.hero-copy{padding:23px 18px}.hero h2{font-size:27px}
+  .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metric{padding:15px 12px}.metric-value{font-size:18px}
+  .training-card,.panel{padding:17px}.mission-hud{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.mission-hud>div{padding:13px 14px;border-bottom:1px solid var(--line)}.mission-hud strong{font-size:18px}
+  .mission-terminal .messages{padding:16px;min-height:200px}.message,.markdown{font-size:16px}.composer{padding:12px}.mission-side{grid-template-columns:1fr}
+  .command-progress{grid-template-columns:48px minmax(0,1fr);padding:15px;gap:13px}.game-stat{padding:0}.queue-board{padding:15px}.queue-ticket{gap:11px}.queue-timing{min-width:0}
+  .rank-lineup{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.rank-current,.rank-gallery-rules{grid-template-columns:1fr;gap:16px}.rank-tier h2{font-size:13px;min-height:48px}
+  .menu-stage{grid-template-columns:1fr;padding:20px 0}.menu-title{font-size:clamp(36px,11vw,54px)!important}.menu-tagline{font-size:16px}.menu-world{min-height:240px}
+  .progression-toolbar,.progression-page-controls{flex-wrap:wrap}.progression-tier-grid,.progression-reward-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .footer{padding:14px;font-size:10px}.button{padding:9px 11px}
+}
+@media(prefers-reduced-motion:reduce){.rank-current-meter progress::-webkit-progress-value,progress::-webkit-progress-value{transition:none}.result-animate{animation:none}}
+
+/* Pixel sprites are cropped in CSS; the generated atlas files stay intact. */
+:root body .pixel-sprite{display:block;position:relative;overflow:hidden;width:100%;height:100%;min-width:0;flex:none;image-rendering:pixelated;pointer-events:none}
+:root body .pixel-sprite>img.pixel-sprite-sheet{position:absolute;inset:auto;left:calc(var(--sprite-col)*-100%);top:calc(var(--sprite-row)*-100%);width:200%;height:calc(var(--sprite-rows)*100%);max-width:none;max-height:none;margin:0;object-fit:fill;object-position:initial;image-rendering:pixelated;animation:none;transform:none;filter:none;opacity:1;pointer-events:none}
+:root body .mastery-animal>.pixel-sprite{width:52px;height:64px;margin:0 auto 9px}
+:root body .companion-choice-art>.pixel-sprite{width:100%;height:100%;position:absolute;inset:0}
+:root body .companion-choice-art>span:not(.pixel-sprite){z-index:2}
+:root body .progression-art:has(>.pixel-sprite){width:94px;height:124px;position:relative;isolation:isolate}
+:root body .progression-art.compact:has(>.pixel-sprite){width:62px;height:82px}
+:root body .eternal-mastery>.progression-art:has(>.pixel-sprite){width:112px;height:150px}
+:root body .character-breakout>.portrait-creature{height:134%;width:118%;left:-9%;bottom:0;clip-path:inset(-35% -35% 0);image-rendering:pixelated;filter:none;animation-timing-function:ease-in-out}
+:root body .character-breakout.frame-astral>.portrait-creature{animation-timing-function:ease-in-out}
+:root body .character-breakout>.portrait-scene-background{background:repeating-linear-gradient(0deg,transparent 0 15px,#ffffff06 15px 16px),linear-gradient(150deg,var(--creature-scene),#171329);border-radius:0}
+:root body .character-breakout>.portrait-scene-background svg{shape-rendering:crispEdges;stroke-width:1;opacity:.25}
+:root body .pixel-icon,:root body .pixel-icon *{fill:currentColor;stroke:none;shape-rendering:crispEdges}
+:root body .eternal-frame-effect svg{shape-rendering:crispEdges}.eternal-current,.eternal-counter{animation-timing-function:steps(16,end)}
+:root body .grand-rank svg,:root body .mastery-badge-art svg,:root body .pass-emblem svg{shape-rendering:crispEdges;filter:none}
+:root body .grand-rank{filter:none}.grand-rank .rank-core{stroke-width:3}.grand-rank .rank-rim{stroke-width:3}.rank-stars i{font-family:var(--pixel-heading)}
+:root body .progression-art,:root body .progression-avatar{border-radius:0;box-shadow:-3px 0 #0c0a18,3px 0 #0c0a18,0 -3px #0c0a18,0 3px #0c0a18,4px 4px #080812}
+:root body .button{background:var(--paper);color:var(--ink);border:2px solid #74617c;box-shadow:3px 3px 0 #080812;border-radius:0}
+:root body .button.primary{background:var(--accent);border:2px solid #ffb28a;color:#1e1426;box-shadow:0 4px 0 #813b43,4px 4px 0 #080812}
+:root body .button.primary:hover{background:#f58e70}.button:active:not(:disabled){transform:translate(2px,2px)}
+:root body .profile-details,:root body .profile-equipped,:root body .mission-side{border:0;box-shadow:none;background:transparent}
+:root body .menu-world{background:transparent;position:relative}
+:root body .menu-network{background:none;shape-rendering:crispEdges;max-height:46vh;overflow:visible}
+:root body .menu-copy .menu-title{font-size:clamp(28px,4.2vw,64px)!important;line-height:1.2!important;letter-spacing:0!important;perspective:none}
+:root body .title-line{color:#f6dfad;text-shadow:2px 0 #572b3e,-2px 0 #572b3e,0 -2px #572b3e,0 2px #572b3e,4px 4px #ce624f,7px 7px #0b091a;transform:none;background:none;-webkit-text-fill-color:currentColor;-webkit-text-stroke:0}
+:root body .title-simulator{color:#f0bc5e}.title-dot{color:var(--green)}
+:root body .menu-brand{letter-spacing:0}.menu-brand>span{font-family:var(--pixel-heading);font-size:11px;letter-spacing:0}
+:root body .menu-workspace{border:0;box-shadow:none;background:transparent}
+:root body .menu-rank,:root body .menu-objective{padding:18px;margin-top:14px;min-width:0}
+:root body .menu-companion{right:8px;top:75px;border:2px solid var(--gold);box-shadow:3px 3px #080812;background:#24213cf2}
+:root body .menu-footer{font-size:10px;letter-spacing:0;line-height:1.8}
+:root body progress{appearance:none;height:16px;border:2px solid #0d0c1a;border-radius:0;background:#11101f;box-shadow:0 2px #74617c;accent-color:var(--green)}
+:root body progress::-webkit-progress-bar{background:repeating-linear-gradient(90deg,#303045 0 12px,#11101f 12px 16px)}
+:root body progress::-webkit-progress-value{background:repeating-linear-gradient(90deg,var(--green) 0 10px,#d3f2bd 10px 12px,#173943 12px 16px);border-radius:0}
+:root body .rank-meter progress::-webkit-progress-value,:root body .reward-track i{background:repeating-linear-gradient(90deg,#f0c15f 0 10px,#fff0b2 10px 12px,#5a4144 12px 16px)}
+:root body .progression-mission progress::-webkit-progress-value{background:repeating-linear-gradient(90deg,#c989c9 0 10px,#ffcef2 10px 12px,#4c2f5b 12px 16px)}
+:root body .companion-ability progress::-webkit-progress-value{background:repeating-linear-gradient(90deg,#66c6d5 0 10px,#c8faff 10px 12px,#1c4352 12px 16px)}
+:root body .reward-track{height:16px;box-shadow:0 2px #74617c;overflow:hidden;background:#292641;border-radius:0}
+:root body .rank-tier,:root body .progression-tier,:root body .progression-reward,:root body .companion-choice{border-radius:0;box-shadow:4px 4px #0a081a;background:#24213b}
+:root body .result-screen{background:#1b1730;border:3px solid var(--gold);border-radius:0;box-shadow:5px 5px #080812}
+:root body .result-center{background:transparent;box-shadow:none;border:0}.result-screen.won .result-center h2{color:#a2e3a2}.result-screen.lost .result-center h2{color:#ef8d78}
+:root body .result-medal{border-radius:0;background:#283d3c;border:3px solid var(--green);box-shadow:4px 4px #080812}
+:root body .result-screen .result-kicker{font-family:var(--pixel-heading);font-size:12px}.result-screen .result-center h2{font-family:var(--pixel-heading);font-size:clamp(22px,3vw,36px);line-height:1.5;letter-spacing:0}
+:root body .message{padding:12px;border:0;border-left:3px solid #4e5263;background:#22213a;box-shadow:3px 3px #0f1020}
+:root body .message.user{border-left-color:var(--green);background:#273d40}.message .markdown{font-family:Consolas,'Courier New',monospace;line-height:1.7}
+:root body .markdown pre{border:2px solid #514a62;box-shadow:3px 3px #080812}
+@media(max-width:1180px){:root body .menu-companion{top:55px;font-size:12px}.menu-brand>span{font-size:9px}}
+@media(max-width:690px){:root body .menu-stage{grid-template-columns:1fr}:root body .menu-copy .menu-title{font-size:clamp(27px,7.6vw,48px)!important}:root body .menu-network{max-height:340px}:root body .menu-companion{top:70px}:root body .play-brand{font-size:17px}.play-tabs button{font-size:10px}}
+@media(prefers-reduced-motion:reduce){:root body .portrait-creature{animation:none!important;transform:none;will-change:auto}:root body .eternal-current,:root body .eternal-counter{animation:none!important}}
+
+html:root body{font-family:Consolas,'Courier New',monospace;font-size:15px}
+:root body .pixel-sprite{clip-path:inset(0 4%)}
+:root body .character-breakout>.pixel-sprite.portrait-creature{clip-path:inset(0 4%)}
+:root body .menu-companion{top:23px;right:0;transform:translateY(-7%);padding:8px 10px;font-size:12px}
+:root body .menu-companion .progression-avatar.avatar-large{width:40px;height:52px}
+:root body .menu-secondary>button{font-family:var(--pixel-heading);font-size:10px;min-height:46px}
+:root body .menu-play,:root body .menu-choice{font-family:var(--pixel-heading);font-size:13px}
+:root body .menu-play small,:root body .menu-choice small{font-family:Consolas,monospace;font-size:12px}
+:root body .progression-overline,:root body .eyebrow,:root body .menu-edition{letter-spacing:0!important}
+:root body .play-tabs button{letter-spacing:0}
+
+:root body .em-symbol .em-pixel{fill:currentColor;stroke:none;shape-rendering:crispEdges}
+:root body .em-orbit{animation-timing-function:steps(12,end)}
+:root body .grand-rank .rank-core{fill:#343249;stroke:currentColor;stroke-width:3}
+:root body .grand-rank .rank-rim{fill:#171329;stroke:currentColor;stroke-width:3}
+:root body .grand-rank .rank-gem{stroke:#fff0bf;fill:currentColor;stroke-width:1}
+:root body .grand-rank svg,:root body .mastery-badge-art svg{filter:none}
+:root body .result-particles i,:root body .result-progression>div,:root body .result-rewards>div,:root body .secret-reveal,:root body .mastery-animal,:root body .mastery-badge-art,:root body .mastery-badge-preview,:root body .pass-seal,:root body .ability-symbol,:root body .passive-symbol{border-radius:0}
+
+:root body :is(h1,h2,h3,h4){overflow-wrap:anywhere}
+:root body .progression-pass-hero{grid-template-columns:minmax(0,1fr) 96px}
+:root body .progression-pass-hero>div{min-width:0}
+:root body .progression-pass-level{flex-wrap:wrap}
+@media(max-width:650px){:root body .progression-pass-hero{grid-template-columns:minmax(0,1fr);padding:18px 16px}:root body .progression-pass-hero h2{font-size:22px}:root body .progression-panel{padding:16px}:root body .pass-seal{display:none}}
+
+:root body .result-score>strong,:root body .earned-xp strong,:root body .result-total strong,:root body .mission-hud strong,:root body .menu-rank b,:root body .grand-rank>strong{font-family:var(--pixel-heading)}
+:root body .result-medal,:root body .result-particles i,:root body .level-pick,:root body .shift-pick{animation-timing-function:steps(10,end)}
+
+/* The light appearance uses the same arcade shapes with a warm paper palette. */
+:root[data-theme="light"]{--bg:#eee3c5;--paper:#fff3d4;--ink:#302940;--muted:#67596b;--line:#a48c8c;--accent:#dd705b;--accent-hover:#ee8c72;--green:#226b64;--soft-green:#cce0cc;--lift:#e5d3bb;--gold:#85561e;color-scheme:light}
+:root[data-theme="light"] body{background:var(--bg);color:var(--ink)}
+:root[data-theme="light"] body :is(#play-header,.main-shell,.footer){background:var(--bg)}
+:root[data-theme="light"] body :is(.panel,.hero,.metrics,.training-card,.activity-panel,.learning-note,.command-progress,.mission,.queue-board,.queue-idle,.difficulty-card,.mission-hud,.mission-terminal,.contact-card,.utility-pick,.level-pick,.mode-pick,.shift-pick,.profile-showcase,.progression-panel,.progression-pass-hero,.progression-hub-hero,.progression-tier,.progression-reward,.progression-mission,.mastery-account,.mastery-companion,.eternal-mastery,.companion-choice,.companion-ability,.companion-passive,.mastery-animal,.rank-tier,.rank-current,.rank-gallery-info,.profile-quick,.mastery-requirements,.mastery-badge-preview,.passive-fact,.passive-observation){background:var(--paper)!important;color:var(--ink);border-color:var(--line)!important}
+:root[data-theme="light"] body main :is(h1,h2,h3,h4,strong){color:var(--ink)}
+:root[data-theme="light"] body main :is(p,small,.forms-total,.mastery-view-caption,.progression-overline,.progression-pass-level,.progression-rarity){color:var(--muted)}
+:root[data-theme="light"] body :is(input,textarea,select,.form-field input,.form-field select,.form-field textarea){background:#fbf5e5!important;color:var(--ink)!important;border-color:var(--line)!important}
+:root[data-theme="light"] body .message,:root[data-theme="light"] body .message.user{background:var(--lift);color:var(--ink)}
+:root[data-theme="light"] body .markdown :is(pre,code){background:#e1d7c3;color:#2c4b45}
+:root[data-theme="light"] body :is(.play-tabs button,.profile-tabs button,.progression-tabs button,.sound-button){color:var(--ink)}
+:root[data-theme="light"] body :is(.play-tabs button[aria-current],.profile-tabs button[aria-current],.progression-tabs button[aria-current]){background:var(--lift);color:#75431d}
+:root[data-theme="light"] body .action-console{background:var(--lift)}
+:root[data-theme="light"] body .dock-caption{color:var(--ink)}
+:root[data-theme="light"] body .result-screen{--ink:#f4e5bf;--muted:#b8b3a5;--gold:#e7bc5a;background:#1b1730;color:var(--ink)}
+:root[data-theme="light"] body .result-screen :is(h2,strong,p,small){color:var(--ink)}
+:root body .start-screen{--ink:#f4e5bf;--paper:#24233e;--muted:#b8b3a5;--gold:#e7bc5a;--green:#58b7a1;--accent:#e46b59;--line:#514a62;color:var(--ink)}
+
+/* Atlas-specific display silhouettes keep the generated backdrop outside the moving character. */
+:root body .pixel-sprite[data-character="chimera"][data-variant="base"]{clip-path:polygon(42.06% 2.64%,37.11% 5.66%,32.42% 8.40%,31.64% 11.82%,33.46% 14.36%,38.54% 16.21%,43.49% 11.62%,45.18% 10.35%,51.43% 14.94%,55.86% 19.04%,56.38% 18.65%,51.95% 14.36%,51.43% 11.72%,57.94% 16.70%,63.02% 20.12%,65.36% 22.85%,70.57% 21.00%,72.79% 17.09%,71.48% 13.67%,66.67% 9.86%,61.20% 7.13%,70.70% 8.79%,74.87% 10.25%,78.13% 12.40%,80.34% 15.43%,80.08% 19.43%,84.38% 16.02%,85.29% 16.70%,85.55% 25.39%,84.51% 28.42%,83.46% 30.76%,84.24% 32.52%,81.77% 33.98%,82.68% 35.55%,81.51% 36.91%,84.64% 39.16%,82.03% 39.16%,82.68% 41.02%,85.94% 43.36%,83.07% 43.16%,84.38% 45.12%,83.98% 46.09%,86.59% 48.54%,83.72% 49.22%,85.94% 51.95%,83.46% 52.34%,85.16% 54.69%,83.20% 54.98%,84.77% 56.64%,84.24% 57.42%,85.81% 59.18%,84.24% 60.25%,85.29% 63.57%,87.37% 60.64%,88.93% 60.55%,90.76% 65.72%,92.84% 63.67%,95.31% 63.18%,95.31% 68.07%,96.74% 69.82%,97.79% 71.39%,97.01% 74.71%,97.27% 78.52%,96.09% 81.84%,94.53% 85.64%,91.67% 88.67%,86.98% 92.68%,82.03% 96.09%,22.92% 95.90%,19.53% 94.24%,12.11% 89.84%,8.85% 87.89%,7.16% 85.84%,4.43% 84.96%,3.52% 82.91%,1.17% 79.88%,1.43% 77.25%,1.69% 72.95%,3.13% 71.78%,1.69% 70.31%,4.04% 67.09%,3.65% 65.72%,9.11% 62.01%,6.64% 59.08%,6.64% 55.66%,7.81% 55.47%,9.51% 56.54%,14.84% 58.40%,14.84% 55.96%,17.19% 55.27%,15.76% 53.03%,12.50% 48.83%,12.89% 46.97%,11.46% 44.43%,10.29% 41.21%,9.11% 39.45%,10.16% 37.99%,11.46% 36.52%,10.29% 34.96%,11.98% 34.47%,12.11% 32.62%,13.80% 31.64%,12.89% 31.05%,15.10% 29.30%,14.97% 27.54%,17.58% 27.05%,16.15% 25.68%,18.23% 23.93%,25.26% 23.24%,21.22% 21.09%,19.27% 18.55%,18.75% 16.41%,19.40% 13.28%,22.79% 9.86%,27.34% 6.64%,32.81% 4.30%,37.37% 2.83%)}
+:root body .pixel-sprite[data-character="chimera"][data-variant="lord"]{clip-path:polygon(39.32% 1.95%,33.20% 4.88%,28.52% 8.50%,27.99% 11.23%,30.21% 13.77%,34.77% 15.04%,37.76% 16.11%,42.32% 10.45%,43.62% 9.57%,46.88% 12.99%,47.53% 11.72%,49.48% 13.96%,51.95% 16.60%,51.69% 9.96%,53.39% 12.89%,55.99% 10.84%,60.03% 6.25%,63.54% 11.23%,65.10% 14.94%,67.06% 16.99%,68.49% 12.70%,70.57% 15.82%,72.14% 18.07%,74.22% 16.11%,77.08% 13.67%,75.65% 10.64%,70.18% 8.11%,65.36% 6.64%,72.27% 6.84%,78.65% 9.38%,82.55% 12.50%,84.51% 15.63%,85.16% 17.19%,85.81% 15.14%,86.46% 16.89%,86.20% 24.80%,84.38% 30.86%,85.55% 32.32%,83.85% 33.69%,84.77% 35.55%,83.59% 36.91%,86.98% 39.45%,83.85% 39.26%,85.16% 41.50%,87.24% 43.46%,84.77% 43.55%,86.85% 46.29%,88.28% 48.63%,86.33% 49.22%,88.28% 51.66%,86.33% 51.76%,88.15% 53.71%,89.45% 53.52%,90.63% 56.15%,92.32% 54.88%,93.62% 58.69%,94.92% 56.93%,96.22% 60.06%,97.66% 61.13%,97.27% 65.92%,95.70% 69.14%,97.79% 72.56%,97.66% 78.42%,95.70% 84.38%,91.54% 89.55%,85.94% 93.46%,81.38% 96.19%,14.58% 96.09%,10.55% 92.97%,6.12% 89.45%,2.99% 85.45%,2.21% 81.54%,1.17% 78.22%,1.56% 73.14%,1.04% 70.12%,2.08% 66.41%,4.43% 63.77%,2.21% 64.45%,3.78% 61.72%,5.08% 59.38%,4.82% 55.37%,5.86% 55.76%,8.33% 58.30%,11.46% 57.42%,12.50% 54.98%,11.07% 51.27%,11.72% 50.88%,15.49% 54.88%,19.27% 57.03%,16.41% 53.61%,14.32% 50.49%,14.58% 47.46%,14.06% 45.70%,13.28% 43.16%,11.46% 40.53%,10.68% 37.70%,11.98% 34.47%,10.94% 34.57%,12.89% 31.84%,14.58% 29.39%,18.49% 26.66%,23.96% 24.61%,22.14% 23.14%,18.88% 22.66%,23.96% 21.58%,28.65% 22.27%,24.22% 20.41%,20.83% 18.85%,19.01% 15.72%,19.40% 12.30%,20.96% 9.28%,23.18% 6.84%,26.95% 4.59%,32.03% 2.73%)}
+:root body :is(section,article,fieldset,summary,.ranked-result,.companion-result,.result-progression,.mini-avatar){border-radius:0}
+:root body .spinner{border-radius:0;animation-timing-function:steps(4,end)}
+
+:root body .nav-button{font-size:16px}
+
+/* The luminous perimeter sits outside the silhouette, behind the crown.
+   Eternal animates only the frame; Astral also floats the foreground. */
+:root body .character-breakout>.portrait-creature{width:100%;left:0}
+:root body .character-breakout.frame-eternal>.portrait-creature{animation:none;transform:none;will-change:auto}
+:root body .character-breakout>.eternal-frame-effect{--lord-glow:#56ffe4;--lord-edge:#c9fff4;z-index:2;inset:-8px;border:3px solid var(--lord-edge);outline:2px solid #3b796e;outline-offset:2px;box-shadow:0 0 9px var(--lord-glow),0 0 22px #56ffe4b3,0 0 42px #56ffe454;border-radius:0}
+:root body .character-breakout.frame-astral>.eternal-frame-effect{--lord-glow:#d681ff;--lord-edge:#fff0b0;outline-color:#ba74df;box-shadow:0 0 10px #ffe69c,0 0 26px #db8bffd9,0 0 50px #c879ff80}
+:root body .character-breakout>.eternal-frame-effect>svg{display:none}
+@property --lord-perimeter-angle{syntax:"<angle>";inherits:false;initial-value:0deg}
+:root body .character-breakout>.eternal-frame-effect::before{content:"";position:absolute;inset:-3px;padding:3px;background:conic-gradient(from var(--lord-perimeter-angle),transparent 0deg 35deg,#56ffe435 65deg,var(--lord-glow) 95deg,#f0fffa 108deg,transparent 110deg 215deg,#56ffe435 245deg,var(--lord-glow) 275deg,#f0fffa 288deg,transparent 290deg);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;animation:lord-frame-flow 6s linear infinite;pointer-events:none}
+:root body .character-breakout>.eternal-frame-effect::after{content:"";position:absolute;inset:-4px;border:1px solid var(--lord-glow);box-shadow:0 0 18px var(--lord-glow),0 0 36px var(--lord-glow);opacity:.35;animation:lord-perimeter-glow 3s ease-in-out infinite alternate;pointer-events:none}
+:root body .character-breakout.frame-astral>.eternal-frame-effect::after{animation-duration:2.6s}
+:root body .character-breakout.frame-astral>.eternal-frame-effect::before{background:conic-gradient(from var(--lord-perimeter-angle),transparent 0deg 20deg,#d681ff55 60deg,#d681ff 90deg,#fff0b0 112deg,#fff 120deg,transparent 122deg 200deg,#d681ff55 240deg,#d681ff 270deg,#fff0b0 292deg,#fff 300deg,transparent 302deg);animation-duration:4.5s}
+:root body .character-breakout.frame-astral .astral-halo{display:block;inset:-9px;padding:2px;border-radius:0;background:conic-gradient(from var(--lord-perimeter-angle),transparent 0deg 85deg,#bb83ff 135deg,#ffe9aa 155deg,transparent 157deg 265deg,#bb83ff 315deg,#ffe9aa 335deg,transparent 337deg);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;box-shadow:none;mix-blend-mode:normal;animation:lord-frame-flow 8s linear infinite reverse;pointer-events:none}
+:root body .character-breakout.frame-astral .astral-light-sweep{display:block;inset:-11px;background:linear-gradient(#fff0b0 0 0) left top/14px 3px no-repeat,linear-gradient(#fff0b0 0 0) left top/3px 14px no-repeat,linear-gradient(#fff0b0 0 0) right top/14px 3px no-repeat,linear-gradient(#fff0b0 0 0) right top/3px 14px no-repeat,linear-gradient(#fff0b0 0 0) left bottom/14px 3px no-repeat,linear-gradient(#fff0b0 0 0) left bottom/3px 14px no-repeat,linear-gradient(#fff0b0 0 0) right bottom/14px 3px no-repeat,linear-gradient(#fff0b0 0 0) right bottom/3px 14px no-repeat;mix-blend-mode:normal;animation:lord-astral-corners 3s ease-in-out infinite alternate;pointer-events:none}
+:root body .character-breakout .eternal-spark{left:0;top:0;right:auto;bottom:auto;width:4px;height:9px;border-radius:0;background:var(--lord-edge);box-shadow:0 0 5px var(--lord-edge),0 0 12px var(--lord-glow);offset-path:inset(-4px);offset-anchor:center;offset-rotate:auto;animation:lord-frame-spark 6s linear infinite;opacity:1}
+:root body .character-breakout .eternal-spark.spark-two{animation-delay:-2s}
+:root body .character-breakout .eternal-spark.spark-three{animation-delay:-4s}
+:root body .character-breakout.frame-astral .eternal-spark{animation-direction:reverse;background:#fff0b0}
+@keyframes lord-frame-flow{to{--lord-perimeter-angle:360deg}}
+@keyframes lord-frame-spark{from{offset-distance:0%}to{offset-distance:100%}}
+@keyframes lord-astral-corners{from{opacity:.45;filter:drop-shadow(0 0 2px #d681ff)}to{opacity:1;filter:drop-shadow(0 0 6px #fff0b0)}}
+@keyframes lord-perimeter-glow{from{opacity:.25}to{opacity:.7}}
+@media(prefers-reduced-motion:reduce){:root body .character-breakout>.eternal-frame-effect::before,:root body .character-breakout>.eternal-frame-effect::after,:root body .character-breakout.frame-astral .astral-halo,:root body .character-breakout.frame-astral .astral-light-sweep{animation:none!important;opacity:.65}:root body .character-breakout .eternal-spark{display:none;animation:none!important}}

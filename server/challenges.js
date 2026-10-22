@@ -3,6 +3,8 @@
 const { SCENARIOS } = require('./difficulty');
 const { CHARACTERS, validCompanionReward } = require('./characters');
 const { chimeraUnlocked, hiddenCharacter } = require('./secret-companion');
+const { bonusForTier } = require('./pass-extras');
+const { arcaneBonusTotals } = require('./arcane-grants');
 
 // Only known, authored scenario families award topic credit. Archive/report prose
 // is deliberately never interpreted as proof of a solved topic.
@@ -242,7 +244,8 @@ const TIERS = Array.from({ length: 40 }, (_, index) => {
     // individual title/badge tiers.
     reward = { id: `${kind}-pass-${level}`, name: names[nameIndex], kind, rarity: rarityFor(level) };
   }
-  return { level, requiredXp: level * 500, reward: passPresentation(reward, level) };
+  const primary = passPresentation(reward, level);
+  return { level, requiredXp: level * 500, reward: primary, rewards: [primary, bonusForTier(level)] };
 });
 const BASE_REWARDS = [
   { id: 'title-rookie', name: 'Unbound', kind: 'title', rarity: 'common' },
@@ -351,7 +354,9 @@ function expansion(entries, now = new Date(), options = {}) {
   if (!Number.isFinite(parsedNow)) throw new RangeError('Ungültiger Fortschrittszeitpunkt');
   const all = metrics(entries);
   const permanent = PERMANENT.map(def => mission(def, all, 'permanent'));
-  let passXp = permanent.filter(m => m.unlocked).reduce((sum, m) => sum + m.reward, 0);
+  const arcaneBonus = arcaneBonusTotals(options.arcane);
+  const bonusXp = arcaneBonus.passXp;
+  let passXp = bonusXp + permanent.filter(m => m.unlocked).reduce((sum, m) => sum + m.reward, 0);
   const challenges = { timezone: 'UTC', permanent };
   for (const kind of ['daily', 'weekly']) {
     const groups = new Map();
@@ -376,17 +381,23 @@ function expansion(entries, now = new Date(), options = {}) {
     challenges[kind] = { ...active, missions: activeMissions || selections(kind, active.key).map(def => mission(def, {}, `${kind}-${active.key}`)) };
   }
   const masteries = masteriesFor(all);
-  const secretUnlocked = chimeraUnlocked(entries.map(entry => entry.archive), masteries, options.companionXpOffsets);
+  const secretOffsets = { ...options.companionXpOffsets };
+  for (const [id, xp] of Object.entries(arcaneBonus.companionXp)) {
+    const offset = Number.isSafeInteger(secretOffsets[id]) && secretOffsets[id] >= 0 ? secretOffsets[id] : 0;
+    secretOffsets[id] = Math.min(Number.MAX_SAFE_INTEGER, offset + xp);
+  }
+  const secretUnlocked = chimeraUnlocked(entries.map(entry => entry.archive), masteries, secretOffsets);
   const level = Math.min(40, Math.floor(passXp / 500));
-  const battlepass = { xp: passXp, level, next: level === 40 ? null : (level + 1) * 500,
-    progress: level === 40 ? 100 : Math.floor(passXp % 500 / 5), tiers: TIERS.map(tier => ({ ...tier, reward: { ...tier.reward }, unlocked: passXp >= tier.requiredXp })) };
+  const battlepass = { xp: passXp, bonusXp, level, next: level === 40 ? null : (level + 1) * 500, rewardCount: 80,
+    progress: level === 40 ? 100 : Math.floor(passXp % 500 / 5), tiers: TIERS.map(tier => ({ ...tier, reward: { ...tier.reward },
+      rewards: tier.rewards.map(reward => ({ ...reward })), unlocked: passXp >= tier.requiredXp })) };
   const inventory = BASE_REWARDS.map(reward => ({ ...reward }));
   if (secretUnlocked) {
     const secret = CHARACTERS.find(character => character.id === 'chimera');
     inventory.push({ id: 'portrait-chimera-base', name: secret.name, kind: 'portrait', character: secret.id,
       variant: 'base', rarity: secret.rarity });
   }
-  inventory.push(...battlepass.tiers.filter(tier => tier.unlocked).map(tier => ({ ...tier.reward })));
+  inventory.push(...battlepass.tiers.filter(tier => tier.unlocked).flatMap(tier => tier.rewards.map(reward => ({ ...reward }))));
   const ownedIds = new Set(inventory.map(reward => reward.id));
   const characters = CHARACTERS.map(character => character.secret && !secretUnlocked ? hiddenCharacter(character) :
     { ...character, unlocked: ownedIds.has(`portrait-${character.id}-base`) });

@@ -5,6 +5,7 @@ const { DOMAINS, topicsFor } = require('./challenges');
 const { hiddenCharacter } = require('./secret-companion');
 const { SWITCH_LEVEL, SWITCH_XP, MAX_XP, xpAtLevel, levelAt } = require('./companion-levels');
 const { abilityView, archiveAbilityReward } = require('./abilities');
+const { arcaneBonusTotals } = require('./arcane-grants');
 
 const MAX_LEVEL = null;
 const BASE_XP = 100;
@@ -28,7 +29,7 @@ function chosenCharacter(state, inventory) {
   return portrait && characterById(portrait.character) ? portrait.character : null;
 }
 
-function earnedXp(archives, offsets = {}) {
+function earnedXp(archives, offsets = {}, arcane) {
   const totals = Object.fromEntries(CHARACTERS.map(character => [character.id, 0]));
   const seen = new Set();
   for (const archive of archives || []) {
@@ -42,6 +43,7 @@ function earnedXp(archives, offsets = {}) {
     const offset = offsets?.[character.id];
     if (Number.isSafeInteger(offset) && offset >= 0) totals[character.id] = Math.min(MAX_XP, totals[character.id] + offset);
   }
+  for (const [id, xp] of Object.entries(arcaneBonusTotals(arcane).companionXp)) totals[id] = Math.min(MAX_XP, totals[id] + xp);
   return totals;
 }
 
@@ -56,7 +58,7 @@ function legacyLevelOffsets(archives) {
 
 function companionState(state, game) {
   const activeId = chosenCharacter(state, game.inventory);
-  const totals = earnedXp(state.archives, state.companionXpOffsets);
+  const totals = earnedXp(state.archives, state.companionXpOffsets, state.arcane);
   const visibleCharacters = (Array.isArray(game.characters) ? game.characters : CHARACTERS)
     .map(character => character.secret && !character.unlocked ? hiddenCharacter(character) : character);
   const characters = visibleCharacters.map(character => {
@@ -91,7 +93,7 @@ function companionState(state, game) {
       ? null : latestReward || null };
 }
 
-function rewardForArchive(archive, characterId, archives = [], offsets = {}) {
+function rewardForArchive(archive, characterId, archives = [], offsets = {}, arcane) {
   const character = characterById(characterId);
   if (!character || !['career', 'speedrun'].includes(archive.mode)) return null;
   const solvedCount = archive.mode === 'career' ? (archive.summary?.solved === true ? 1 : 0)
@@ -111,7 +113,7 @@ function rewardForArchive(archive, characterId, archives = [], offsets = {}) {
   // Preserve the established archive limit, including any active ability bonus.
   const abilityXp = Math.min(Math.max(0, 18000 - baseXp - bonusXp), archiveAbilityReward(archive, characterId).companionXp);
   const xp = baseXp + bonusXp + abilityXp;
-  const before = earnedXp(archives, offsets)[characterId];
+  const before = earnedXp(archives, offsets, arcane)[characterId];
   const after = Math.min(MAX_XP, before + xp);
   return { version: 1, characterId, character: characterId, characterName: character.name,
     solvedCount: solved, bonusCount, baseXp, bonusXp, abilityXp, xp, appliedXp: after - before,

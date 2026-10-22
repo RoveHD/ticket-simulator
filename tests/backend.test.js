@@ -280,6 +280,54 @@ test('speedrun companion reward counts solved cases and commits XP at shift comp
   assert.equal(done.data.game.companion.current.level, 1);
 });
 
+test('career API advances divisions before increasing difficulty and preserves the standing after restart', async t => {
+  const f = await fixture(t, { ai: require('./desktop-scenarios.cjs').smokeAI, random: () => 0 });
+  for (let i = 1; i <= 10; i++) {
+    const opened = await f.request('/api/start', { mode: 'career', level: 6 });
+    assert.equal(opened.status, 200);
+    assert.equal(opened.data.session.level, 1, 'all three support divisions still train support cases');
+    const done = await f.request('/api/message', { message: 'Abschluss prüfen' });
+    assert.equal(done.status, 200);
+    assert.equal(done.data.game.ranked.totalRr, i * 30);
+    assert.equal(done.data.game.ranked.index, Math.floor(i * 30 / 100));
+    assert.equal(done.data.game.ranked.level, i < 10 ? 1 : 2);
+  }
+  const saved = fs.readFileSync(path.join(f.root, '.sim', 'ui-state.json'), 'utf8');
+  const expected = (await f.request('/api/state')).data.game.ranked;
+  const reopened = await fixture(t, { ai: require('./desktop-scenarios.cjs').smokeAI, prepareRoot(root) {
+    fs.mkdirSync(path.join(root, '.sim'), { recursive: true });
+    fs.writeFileSync(path.join(root, '.sim', 'ui-state.json'), saved);
+  } });
+  assert.deepEqual((await reopened.request('/api/state')).data.game.ranked, expected);
+  const next = await reopened.request('/api/start', { mode: 'career', level: 1 });
+  assert.equal(next.status, 200);
+  assert.equal(next.data.session.level, 2);
+  assert.equal(next.data.game.ranked.name, 'Fortgeschrittener IT-Support 1');
+});
+
+test('v2 career saves retain their main rank and local RR before the first division-aware result', async t => {
+  const archives = Array.from({ length: 4 }, (_, i) => ({ id: `legacy-${i}`, mode: 'career', level: 1,
+    ticket: { number: String(1001 + i) }, elapsed: 10, reference: 10, rankedRulesVersion: 2,
+    summary: { solved: true, score: 95, wrongChanges: 0, unnecessaryChecks: 0 } }));
+  const f = await fixture(t, { ai: require('./desktop-scenarios.cjs').smokeAI, prepareRoot(root) {
+    fs.mkdirSync(path.join(root, '.sim'), { recursive: true });
+    fs.writeFileSync(path.join(root, '.sim', 'ui-state.json'), JSON.stringify({ version: 1, model: 'gpt-6-luna', archives, session: null }));
+  } });
+  const initial = (await f.request('/api/state')).data;
+  assert.equal(initial.game.ranked.name, 'Fortgeschrittener IT-Support 1');
+  assert.equal(initial.game.ranked.rr, 20);
+  const next = await f.request('/api/start', { mode: 'career', level: 6 });
+  assert.equal(next.status, 200);
+  assert.equal(next.data.session.level, 2);
+  const done = await f.request('/api/message', { message: 'Abschluss prüfen' });
+  assert.equal(done.status, 200);
+  assert.equal(done.data.game.ranked.latest.before.totalRr, 320);
+  assert.equal(done.data.game.ranked.latest.delta, 22);
+  const saved = JSON.parse(fs.readFileSync(path.join(f.root, '.sim', 'ui-state.json'), 'utf8'));
+  assert.deepEqual(saved.archives.slice(0, 4), archives);
+  assert.equal(saved.archives.at(-1).rankedRulesVersion, 3);
+});
+
 test('completed tickets store host timestamps and only solved topic metadata for progression', async t => {
   const completedAt = '2026-10-21T12:00:00.000Z';
   const f = await fixture(t, { ai: require('./desktop-scenarios.cjs').smokeAI, now: () => completedAt, random: () => 0 });
@@ -289,6 +337,8 @@ test('completed tickets store host timestamps and only solved topic metadata for
   assert.equal(finished.data.game.xp, 415);
   let saved = JSON.parse(fs.readFileSync(path.join(f.root, '.sim', 'ui-state.json'), 'utf8'));
   assert.equal(saved.archives[0].completedAt, completedAt);
+  assert.equal(saved.archives[0].rankedRulesVersion, require('../server/ranked').RANKED_RULES_VERSION);
+  assert.equal(finished.data.game.ranked.latest.delta, 30);
   assert.equal(saved.archives[0].completedTickets.length, 1);
   assert.equal(saved.archives[0].completedTickets[0].scenarioId, saved.session.plan[0].scenarioId);
   assert.equal((await f.request('/api/message', { message: 'Abschluss prüfen' })).status, 409);
@@ -297,6 +347,7 @@ test('completed tickets store host timestamps and only solved topic metadata for
   await f.request('/api/message', { message: 'Aufgeben' });
   saved = JSON.parse(fs.readFileSync(path.join(f.root, '.sim', 'ui-state.json'), 'utf8'));
   assert.deepEqual(saved.archives[1].completedTickets, []);
+  assert.equal(saved.archives[1].rankedRulesVersion, require('../server/ranked').RANKED_RULES_VERSION);
 });
 
 test('audio preferences validate, persist and survive training reset', async t => {

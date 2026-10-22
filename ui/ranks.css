@@ -1,4 +1,4 @@
-/* One emblem per career rank, using the same badges as the live rank display. */
+/* Six main ranks, each with three divisions and the live rank emblem. */
 .rank-gallery{max-width:1320px;margin:0 auto;color:var(--ink)}
 .rank-gallery-top{display:flex;align-items:center;justify-content:space-between;gap:16px;color:var(--muted);font:10px Consolas,monospace;letter-spacing:1.5px}
 .rank-gallery-top .text-button{display:flex;gap:10px;align-items:center;font-size:12px;letter-spacing:0}
@@ -18,6 +18,21 @@
 .rank-tier h2{font-size:15px;line-height:1.5;margin:0;min-height:68px;display:flex;align-items:center;justify-content:center;overflow-wrap:anywhere;hyphens:auto}
 .rank-tier-threshold{display:block;font:10px Consolas,monospace;letter-spacing:.3px;color:var(--muted);margin:12px 0 17px}
 .rank-tier-state{font:9px Consolas,monospace;letter-spacing:.5px;color:var(--muted)}
+.rank-divisions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;list-style:none;padding:0;margin:12px 0 16px}
+.rank-division{border:1px solid var(--line);padding:9px 2px;color:var(--muted);min-width:0}
+.rank-division strong{font:700 17px Consolas,monospace;display:block;margin-bottom:6px}
+.rank-division small{display:block;font:8px/1.5 Consolas,monospace;overflow-wrap:anywhere}
+.rank-division.is-current{color:var(--rank-color);border-color:var(--rank-color);background:color-mix(in srgb,var(--rank-color) 10%,transparent)}
+.rank-division.is-lower{color:var(--rank-color)}
+.career-tier-copy{min-width:0}
+.career-divisions{display:flex;gap:8px;margin:10px 0 5px}
+.career-division{display:grid;place-items:center;width:34px;height:30px;border:1px solid var(--line);color:var(--muted);font:12px Consolas,monospace}
+.career-division.current{color:var(--green);border-color:var(--green);background:color-mix(in srgb,var(--green) 10%,transparent)}
+.career-division.completed{color:var(--green)}
+.command-progress .grand-rank small{display:none}
+.command-progress .rank-copy{min-width:0}
+.command-progress .rank-copy h2{overflow-wrap:anywhere;hyphens:auto}
+.rank-gallery .rank-tier h2{min-height:78px}
 .rank-tier.is-current{border-color:var(--rank-color);background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--rank-color) 7%,transparent))}
 .rank-tier.is-current .rank-tier-state{color:var(--rank-color);font-weight:700}
 .rank-tier.is-current:before{content:'';position:absolute;top:-3px;left:calc(50% - 3px);width:6px;height:6px;background:var(--rank-color);transform:rotate(45deg)}
@@ -55,4 +70,6 @@ body[data-screen="ranks"] main{padding-top:24px;padding-bottom:24px}
 @media(max-width:1250px){.rank-lineup{gap:9px}.rank-tier{padding-left:4px;padding-right:4px}.rank-tier-emblem{height:130px;margin:14px 0 6px}.rank-tier-emblem .grand-rank{width:100px;height:115px}.rank-tier h2{font-size:13px}.rank-tier-threshold{font-size:9px}}
 @media(max-width:1000px){.rank-lineup{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 15px}.rank-tier-emblem{height:100px;margin:10px 0 5px}.rank-tier-emblem .grand-rank{width:83px;height:98px}.rank-tier-emblem .grand-rank strong{font-size:15px;margin-top:16px}.rank-tier h2{min-height:42px}.rank-tier-threshold{margin:8px 0 12px}.rank-gallery-heading{margin:22px auto 26px}.rank-current{gap:22px}.rank-current h2{font-size:20px}.rank-gallery-rules{gap:22px}}
 @media(max-width:650px){.rank-gallery-top>span{display:none}.rank-current,.rank-gallery-rules{grid-template-columns:1fr;gap:20px}.rank-gallery-heading h1{font-size:29px}.rank-gallery-heading p{font-size:13px}.rank-lineup{gap:16px 8px}.rank-tier h2{font-size:12px;min-height:54px}.rank-tier-number,.rank-tier-threshold,.rank-tier-state{font-size:8px;letter-spacing:0}}
+@media(max-width:500px){.rank-lineup{grid-template-columns:repeat(2,minmax(0,1fr))}.rank-division small{font-size:8px}.rank-gallery-heading p{font-size:12px}}
+@media(max-width:690px){body .command-progress{grid-template-columns:repeat(2,minmax(0,1fr))}.command-progress>.grand-rank{grid-column:1/-1;justify-self:center}.command-progress>.rank-copy{grid-column:1/-1}.command-progress>.game-stat{min-width:0}.command-progress .rank-copy h2{font-size:18px}}
 @media(max-height:800px) and (min-width:1001px){.rank-gallery-heading{margin:18px auto 22px}.rank-gallery-heading h1{font-size:36px;margin:9px 0 12px}.rank-tier-emblem{height:115px;margin:10px 0 5px}.rank-tier-emblem .grand-rank{width:100px;height:112px}.rank-tier{padding-top:12px;padding-bottom:12px}.rank-tier h2{min-height:50px}.rank-tier-threshold{margin:10px 0 12px}.rank-current{padding:18px 0;margin-top:15px}.rank-gallery-rules{padding-top:18px}}

@@ -1,29 +1,193 @@
 'use strict';
 
-const icons = {
-  grid: '<rect x="3" y="3" width="7" height="7" rx="1.4"/><rect x="14" y="3" width="7" height="7" rx="1.4"/><rect x="3" y="14" width="7" height="7" rx="1.4"/><rect x="14" y="14" width="7" height="7" rx="1.4"/>',
-  terminal: '<rect x="3" y="4" width="18" height="16" rx="3"/><path d="m7 9 3 3-3 3m6 0h4"/>',
-  bolt: '<path d="m13 2-9 12h7l-1 8 10-13h-8z"/>',
-  chart: '<path d="M4 3v17h17M8 15v-4m5 4V7m5 8V5"/>',
-  file: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8m-8 4h5"/>',
-  settings: '<path d="m9 3-1 3-3 1-2 4 2 2v4l4 2 3-1 3 1 4-2v-4l2-2-2-4-3-1-1-3z"/><circle cx="12" cy="11" r="3"/>',
-  arrow: '<path d="M4 12h16m-6-6 6 6-6 6"/>',
-  refresh: '<path d="M20 7v5h-5M4 17v-5h5M5 8a8 8 0 0 1 13-3l2 3M4 16l2 3a8 8 0 0 0 13-3"/>',
-  check: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
-  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-  layers: '<path d="m12 3 10 5-10 5L2 8zm-9 9 9 5 9-5m-18 5 9 5 9-5"/>',
-  target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
-  calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18m-14 4h2m6 0h2"/>',
-  light: '<path d="M9 18h6m-5 3h4M8 14a6 6 0 1 1 8 0l-1 2H9z"/>',
-  shield: '<path d="m12 3 8 3v6c0 5-8 9-8 9S4 17 4 12V6zM8 12l3 3 5-6"/>',
-  send: '<path d="m3 3 18 9-18 9 3-9zm3 9h15"/>',
-  back: '<path d="M20 12H4m6-6-6 6 6 6"/>',
-  link: '<path d="m10 13 4-4m-7 6-1 1a4 4 0 0 1-6-6l5-5a4 4 0 0 1 6 0m2 4 1-1a4 4 0 0 1 6 6l-5 5a4 4 0 0 1-6 0" transform="translate(2 0)"/>',
+// Eight-pixel glyphs use filled, integer-aligned blocks throughout the game.
+const pixelIconGlyphs = {
+  "grid": [
+    "11100111",
+    "10100101",
+    "11100111",
+    "00000000",
+    "00000000",
+    "11100111",
+    "10100101",
+    "11100111"
+  ],
+  "terminal": [
+    "11111111",
+    "10000001",
+    "10100001",
+    "10010001",
+    "10100101",
+    "10000001",
+    "10000001",
+    "11111111"
+  ],
+  "bolt": [
+    "00011000",
+    "00111000",
+    "01110000",
+    "11111110",
+    "00011100",
+    "00111000",
+    "00110000",
+    "01100000"
+  ],
+  "chart": [
+    "10000000",
+    "10000010",
+    "10010010",
+    "10010010",
+    "11010010",
+    "11011010",
+    "11011010",
+    "11111111"
+  ],
+  "file": [
+    "01111000",
+    "01001100",
+    "01000110",
+    "01000010",
+    "01111010",
+    "01000010",
+    "01111010",
+    "01111110"
+  ],
+  "settings": [
+    "00111100",
+    "01100110",
+    "11000011",
+    "10011001",
+    "10011001",
+    "11000011",
+    "01100110",
+    "00111100"
+  ],
+  "arrow": [
+    "00001000",
+    "00001100",
+    "00000110",
+    "11111111",
+    "11111111",
+    "00000110",
+    "00001100",
+    "00001000"
+  ],
+  "back": [
+    "00010000",
+    "00110000",
+    "01100000",
+    "11111111",
+    "11111111",
+    "01100000",
+    "00110000",
+    "00010000"
+  ],
+  "refresh": [
+    "00111100",
+    "01100111",
+    "11000011",
+    "10000011",
+    "11000001",
+    "11000011",
+    "11100110",
+    "00111100"
+  ],
+  "check": [
+    "00111100",
+    "01100110",
+    "11000011",
+    "10001001",
+    "10110001",
+    "11010011",
+    "01100110",
+    "00111100"
+  ],
+  "clock": [
+    "00111100",
+    "01100110",
+    "11010011",
+    "10010001",
+    "10011101",
+    "11000011",
+    "01100110",
+    "00111100"
+  ],
+  "layers": [
+    "00011000",
+    "01111110",
+    "11011011",
+    "00111100",
+    "11000011",
+    "01111110",
+    "11000011",
+    "00111100"
+  ],
+  "target": [
+    "00111100",
+    "01100110",
+    "11011011",
+    "10111101",
+    "10111101",
+    "11011011",
+    "01100110",
+    "00111100"
+  ],
+  "calendar": [
+    "01000010",
+    "11111111",
+    "11000011",
+    "11111111",
+    "10000001",
+    "10101001",
+    "10000001",
+    "11111111"
+  ],
+  "light": [
+    "00111100",
+    "01100110",
+    "01000010",
+    "01000010",
+    "01100110",
+    "00111100",
+    "00111100",
+    "00011000"
+  ],
+  "shield": [
+    "11111111",
+    "10000001",
+    "10000001",
+    "10011001",
+    "01011010",
+    "01000010",
+    "00100100",
+    "00011000"
+  ],
+  "send": [
+    "11000000",
+    "11110000",
+    "10111100",
+    "10001111",
+    "11111111",
+    "10001111",
+    "10111100",
+    "11110000"
+  ],
+  "link": [
+    "00011110",
+    "00110011",
+    "01100011",
+    "11001110",
+    "01110011",
+    "11000110",
+    "11001100",
+    "01111000"
+  ]
 };
-const icon = name => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${icons[name] || icons.file}</svg>`;
+const icons = Object.fromEntries(Object.entries(pixelIconGlyphs).map(([name,rows])=>[name,rows.flatMap((row,y)=>[...row].flatMap((bit,x)=>bit==='1'?['M'+(x*2)+' '+(y*2)+'h2v2h-2z']:[])).join('')]));
+const icon = name => '<svg class="icon pixel-icon" viewBox="0 0 16 16" aria-hidden="true" shape-rendering="crispEdges"><path d="'+icons[Object.hasOwn(icons,name)?name:'file']+'"/></svg>';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const levels = ['IT-Support', 'Fortgeschrittener IT-Support', 'Junior-Systemadministrator', 'Systemadministrator', 'Senior-Systemadministrator', 'Infrastruktur-Experte'];
-const views = [['menu', 'Hauptmenü', 'grid'], ['overview', 'Übersicht', 'grid'], ['simulation', 'Simulation', 'terminal'], ['speedrun', 'Speedrun', 'bolt'], ['missions', 'Missionen', 'target'], ['battlepass', 'Battlepass', 'shield'], ['mastery', 'Meisterung', 'chart'], ['career', 'Karriere', 'chart'], ['reports', 'Berichte', 'file'], ['settings', 'Einstellungen', 'settings'], ['profile', 'Dein Profil', 'shield'], ['ranks', 'Rangübersicht', 'shield']];
+const views = [['menu', 'Hauptmenü', 'grid'], ['overview', 'Übersicht', 'grid'], ['simulation', 'Simulation', 'terminal'], ['speedrun', 'Speedrun', 'bolt'], ['missions', 'Missionen', 'target'], ['battlepass', 'Battlepass', 'shield'], ['mastery', 'Meisterung', 'chart'], ['career', 'Karriere', 'chart'], ['reports', 'Berichte', 'file'], ['settings', 'Einstellungen', 'settings'], ['profile', 'Dein Profil', 'shield'], ['ranks', 'Rangübersicht', 'shield'], ['casino', 'Arcane Casino', 'target'], ['leaderboard', 'Leaderboard', 'chart']];
 let state = null, token = '', currentView = 'menu', pending = false, draft = '', selectedReport = null, toastTimer, statusTimer;
 const main = document.querySelector('#main');
 
@@ -113,7 +277,7 @@ function authNotice() {
   return `<div class="notice"><span>Dein ChatGPT-Konto ist noch nicht verbunden. ${esc(state.auth?.reason || 'Öffne die Einstellungen, um die Verbindung zu prüfen.')}</span><button class="text-button" data-view="settings">Verbindung prüfen ${icon('arrow')}</button></div>`;
 }
 function metrics() {
-  const data = [['check', 'Abgeschlossene Tickets', stat('Abgeschlossene Tickets', '0'), '', 'Dein bisheriger Fortschritt'], ['target', 'Durchschnittliche Bewertung', stat('Durchschnittliche Punktzahl'), '/ 100', 'Nach abgeschlossenen Tickets'], ['clock', 'Ø Lösungszeit', stat('Durchschnittliche Lösungszeit'), '', 'Simulierte Arbeitszeit'], ['layers', 'Dein Karriere-Level', state.level || 3, '/ 6', levels[(state.level || 3) - 1]]];
+  const data = [['check', 'Abgeschlossene Tickets', stat('Abgeschlossene Tickets', '0'), '', 'Dein bisheriger Fortschritt'], ['target', 'Durchschnittliche Bewertung', stat('Durchschnittliche Punktzahl'), '/ 100', 'Nach abgeschlossenen Tickets'], ['clock', 'Ø Lösungszeit', stat('Durchschnittliche Lösungszeit'), '', 'Simulierte Arbeitszeit'], ['layers', 'Dein Einsatzrang', (state.game?.ranked?.index || 0) + 1, '/ 18', state.game?.ranked?.name || 'IT-Support 1']];
   return `<div class="metrics">${data.map(([i, label, value, unit, foot]) => `<div class="metric"><div class="metric-label">${icon(i)}${label}</div><div class="metric-value">${esc(value)}<small>${unit}</small></div><div class="metric-foot">${esc(foot)}</div></div>`).join('')}</div>`;
 }
 const infrastructure = menuArtwork;
@@ -128,8 +292,8 @@ function simulation() { return missionScreen(); }
 function pendingPanel() { return `<div class="busy-message"><span class="spinner"></span>Die Simulation wird verarbeitet. Dein Spielstand bleibt erhalten.<button class="text-button" data-action="cancel">Abbrechen</button></div>`; }
 function speedrun() { return loadoutScreen(); }
 function career() {
-  return heading('DEINE KARRIERE', 'Deine Entwicklung als Systemadministrator – nachvollziehbar und auf Basis deiner Entscheidungen.') + gameProgress(false) + `<button class="text-button rank-overview-link" data-view="ranks">Alle sechs Ränge ansehen ${icon('arrow')}</button>` + metrics() +
-    `<div class="two-column"><section class="panel"><span class="eyebrow">DEINE LEISTUNG</span><h2>Der Weg zählt mit.</h2><p>Eine schnelle Lösung ist gut. Eine verstandene, sichere und überprüfte Lösung ist besser. Jeder abgeschlossene Einsatz wird in sechs Kategorien bewertet.</p><ul class="rule-list">${[['Problemlösung', 25], ['Technische Diagnose', 20], ['Effizienz', 15], ['Geschwindigkeit', 15], ['Sicherheit & Risikobewusstsein', 15], ['Prüfung & Dokumentation', 10]].map(([l, n]) => `<li>${l}<strong>${n} Punkte</strong></li>`).join('')}</ul><div class="section-head mt-26"><h3>Deine Gesamtstatistik</h3></div><div class="markdown"><table>${Object.entries(state.stats || {}).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table></div></section><section class="panel"><span class="eyebrow">KARRIEREPFAD</span><h2>Schritt für Schritt.</h2><div class="level-track">${levels.map((l, i) => `<div class="level-step ${i + 1 === state.level ? 'current' : ''}"><span class="level-number">${String(i + 1).padStart(2, '0')}</span><div>${l}${i + 1 === state.level ? '<small>Dein aktuelles Level</small>' : ''}</div></div>`).join('')}</div><p class="fine-print">Die Trainingsstufe bildet deinen Simulationsfortschritt ab.</p></section></div>`;
+  return heading('DEINE KARRIERE', 'Deine Entwicklung als Systemadministrator – nachvollziehbar und auf Basis deiner Entscheidungen.') + gameProgress(false) + `<button class="text-button rank-overview-link" data-view="ranks">Alle 18 Rangstufen ansehen ${icon('arrow')}</button>` + metrics() +
+    `<div class="two-column"><section class="panel"><span class="eyebrow">DEINE LEISTUNG</span><h2>Der Weg zählt mit.</h2><p>Eine schnelle Lösung ist gut. Eine verstandene, sichere und überprüfte Lösung ist besser. Jeder abgeschlossene Einsatz wird in sechs Kategorien bewertet.</p><ul class="rule-list">${[['Problemlösung', 25], ['Technische Diagnose', 20], ['Effizienz', 15], ['Geschwindigkeit', 15], ['Sicherheit & Risikobewusstsein', 15], ['Prüfung & Dokumentation', 10]].map(([l, n]) => `<li>${l}<strong>${n} Punkte</strong></li>`).join('')}</ul><div class="section-head mt-26"><h3>Deine Gesamtstatistik</h3></div><div class="markdown"><table>${Object.entries(state.stats || {}).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table></div></section><section class="panel"><span class="eyebrow">KARRIEREPFAD</span><h2>Schritt für Schritt.</h2>${careerRankTrack()}<p class="fine-print">Jeder Rang hat drei Stufen. Nach Stufe 3 beginnt der nächste Rang bei Stufe 1.</p></section></div>`;
 }
 function reports() {
   const report = state.reports?.find(r => r.id === selectedReport);
@@ -137,7 +301,7 @@ function reports() {
   return heading('EINSATZARCHIV', 'Alle abgeschlossenen Tickets und Schichten. Dein persönliches Nachschlagewerk.') + (state.reports?.length ? `<div class="activity-panel">${state.reports.map(reportRow).join('')}</div>` : `<section class="panel empty-state"><div class="tile-icon">${icon('file')}</div><h2>Hier entsteht dein Erfahrungsarchiv.</h2><p>Nach deinem ersten abgeschlossenen Ticket findest du hier die Ursache, deine Bewertung und konkrete Verbesserungsmöglichkeiten.</p>${button(active() ? 'Zum laufenden Einsatz' : 'Erstes Ticket starten', active() ? 'resume' : 'start', true)}</section>`);
 }
 function settings() {
-  return heading('OPTIONEN', 'Dein Spiel. Deine Regeln. Dein Sound.') + `<div class="two-column"><section class="panel"><div class="setting-status"><div class="tile-icon">${icon('link')}</div><div><h3>ChatGPT-Verbindung</h3><p>${state.auth?.available ? 'Verbunden · Deine vorhandene Anmeldung wird verwendet.' : 'Noch nicht verbunden'}</p></div></div><div class="connection-copy"><p>${esc(state.auth?.reason || 'Die lokale ChatGPT-Anbindung ist bereit. Die Antworten erscheinen direkt hier im Simulator.')}</p><p>Wie bei JORY wird die lokale Codex-Komponente deiner ChatGPT-/Codex-App im Hintergrund verwendet. Ein API-Schlüssel ist nicht erforderlich. Melde dich in der App mit deinem ChatGPT-Konto an und prüfe anschließend die Verbindung.</p></div>${button('Verbindung erneut prüfen', 'connection', false, 'refresh')}<form id="settings-form" class="mt-32"><label class="form-field">Darstellung<select name="theme"><option value="dark" ${state.theme !== 'light' ? 'selected' : ''}>Dunkel</option><option value="light" ${state.theme === 'light' ? 'selected' : ''}>Hell</option></select><small>Wird auf diesem Rechner gespeichert und beim nächsten Start wieder verwendet.</small></label><div class="ranked-settings"><h3>Dein Rang bestimmt die Schwierigkeit</h3><p>Aktuell: <strong>${esc(state.game?.ranked?.name || 'IT-Support')} · ${state.game?.ranked?.rr || 0} / 100 RR</strong></p><p>100 RR pro Rang. Die Schwierigkeit steigt exponentiell: Perfekte Einsätze bringen unten +18 RR, ganz oben nur +7 RR. Abzüge wachsen pro Rang um 25 %; das Verlustlimit steigt von −30 auf −92 RR. Unter 0 RR steigst du ab. Ab Rang 4 kommen anspruchsvolle Linux-Tickets hinzu.</p><p>Nur simulierte Arbeitszeit zählt. Deine reale Schreibzeit bleibt außen vor. Im Speedrun kannst du jede Stufe frei trainieren.</p></div>${difficultyCard(state.level, 'difficulty-preview')}<label class="form-field">Modell<input name="model" value="${esc(state.model)}" pattern="[a-zA-Z0-9][a-zA-Z0-9._:-]{0,99}" maxlength="100" required spellcheck="false"><small>Verwende ein Modell, das für dein ChatGPT-Konto verfügbar ist. Standard: gpt-6-luna.</small></label><button class="button primary" type="submit" ${isBusy() ? 'disabled' : ''}>Einstellungen speichern ${icon('check')}</button></form></section><section class="panel"><div class="tile-icon mb-20">${icon('shield')}</div><h2>Dein eigener Trainingsraum.</h2><p>Spielstand, Chatverlauf und Berichte werden automatisch auf diesem Rechner gespeichert.</p><ul class="rule-list"><li>Anmeldung<strong>ChatGPT-Konto</strong></li><li>Verbindung<strong>Lokal auf deinem PC</strong></li><li>Systembefehle<strong>Nur simuliert</strong></li><li>Fortschritt<strong>Automatisch gespeichert</strong></li></ul><p class="fine-print">KI-Antworten nutzen dein verfügbares ChatGPT-/Codex-Kontingent. Die eingegebenen Simulationstexte werden zur Verarbeitung an OpenAI übermittelt.</p>${audioPanel()}<div class="reset-settings mt-32"><h3>Trainingsdaten zurücksetzen</h3><p>Setzt Karriere, Missionen, Battlepass, Meisterungen, freigeschaltete Belohnungen, laufende Tickets, Chatverläufe, Berichte, Speedruns und die simulierte Unternehmensumgebung zurück. Du beginnst wieder mit Ticket #1001.</p><p>Neustart auf Rang 1 · IT-Support mit 0 RR und einer neuen Begleiterwahl.</p><p class="fine-print">Anmeldung, Modell, Darstellung und Audio bleiben erhalten. Vorher wird eine lokale Sicherung angelegt. Daten aus der Terminal-Version werden im neuen Spielstand nicht mehr eingebunden.</p><button class="button reset-button" data-action="reset" ${isBusy() ? 'disabled' : ''}>Trainingsdaten zurücksetzen ${icon('refresh')}</button></div></section></div>`;
+  return heading('OPTIONEN', 'Dein Spiel. Deine Regeln. Dein Sound.') + `<div class="two-column"><section class="panel"><div class="setting-status"><div class="tile-icon">${icon('link')}</div><div><h3>ChatGPT-Verbindung</h3><p>${state.auth?.available ? 'Verbunden · Deine vorhandene Anmeldung wird verwendet.' : 'Noch nicht verbunden'}</p></div></div><div class="connection-copy"><p>${esc(state.auth?.reason || 'Die lokale ChatGPT-Anbindung ist bereit. Die Antworten erscheinen direkt hier im Simulator.')}</p><p>Wie bei JORY wird die lokale Codex-Komponente deiner ChatGPT-/Codex-App im Hintergrund verwendet. Ein API-Schlüssel ist nicht erforderlich. Melde dich in der App mit deinem ChatGPT-Konto an und prüfe anschließend die Verbindung.</p></div>${button('Verbindung erneut prüfen', 'connection', false, 'refresh')}<form id="settings-form" class="mt-32"><label class="form-field">Darstellung<select name="theme"><option value="dark" ${state.theme !== 'light' ? 'selected' : ''}>Dunkel</option><option value="light" ${state.theme === 'light' ? 'selected' : ''}>Hell</option></select><small>Wird auf diesem Rechner gespeichert und beim nächsten Start wieder verwendet.</small></label><div class="ranked-settings"><h3>Dein Rang bestimmt die Schwierigkeit</h3><p>Aktuell: <strong>${esc(state.game?.ranked?.name || 'IT-Support')} · ${state.game?.ranked?.rr || 0} / 100 RR</strong></p><p>100 RR pro Rang. Leichter Einstieg auf Rang 1–3: Ab 70 Punkten erhältst du einen Einstiegsbonus, Abzüge fallen kleiner aus. Perfekte Einsätze bringen +33/+25/+18 RR; pro Einsatz verlierst du dort höchstens 12/20/30 RR. Ab Rang 4 bleibt die anspruchsvolle Kurve mit +10/+9/+7 RR und maximal 59/73/92 RR Verlust. Bereits abgeschlossene Fälle behalten ihre bisherigen Rangpunkte. Unter 0 RR steigst du ab. Ab Rang 4 kommen anspruchsvolle Linux-Tickets hinzu.</p><p>Nur simulierte Arbeitszeit zählt. Deine reale Schreibzeit bleibt außen vor. Im Speedrun kannst du jede Stufe frei trainieren.</p></div>${difficultyCard(state.level, 'difficulty-preview')}<label class="form-field">Modell<input name="model" value="${esc(state.model)}" pattern="[a-zA-Z0-9][a-zA-Z0-9._:-]{0,99}" maxlength="100" required spellcheck="false"><small>Verwende ein Modell, das für dein ChatGPT-Konto verfügbar ist. Standard: gpt-6-luna.</small></label><button class="button primary" type="submit" ${isBusy() ? 'disabled' : ''}>Einstellungen speichern ${icon('check')}</button></form></section><section class="panel"><div class="tile-icon mb-20">${icon('shield')}</div><h2>Dein eigener Trainingsraum.</h2><p>Spielstand, Chatverlauf und Berichte werden automatisch auf diesem Rechner gespeichert.</p><ul class="rule-list"><li>Anmeldung<strong>ChatGPT-Konto</strong></li><li>Verbindung<strong>Lokal auf deinem PC</strong></li><li>Systembefehle<strong>Nur simuliert</strong></li><li>Fortschritt<strong>Automatisch gespeichert</strong></li></ul><p class="fine-print">KI-Antworten nutzen dein verfügbares ChatGPT-/Codex-Kontingent. Die eingegebenen Simulationstexte werden zur Verarbeitung an OpenAI übermittelt.</p>${audioPanel()}<div class="reset-settings mt-32"><h3>Trainingsdaten zurücksetzen</h3><p>Setzt Karriere, Missionen, Battlepass, Meisterungen, freigeschaltete Belohnungen, laufende Tickets, Chatverläufe, Berichte, Speedruns und die simulierte Unternehmensumgebung zurück. Du beginnst wieder mit Ticket #1001.</p><p>Neustart auf Rang 1 · IT-Support mit 0 RR und einer neuen Begleiterwahl.</p><p class="fine-print">Anmeldung, Modell, Darstellung und Audio bleiben erhalten. Vorher wird eine lokale Sicherung angelegt. Daten aus der Terminal-Version werden im neuen Spielstand nicht mehr eingebunden.</p><button class="button reset-button" data-action="reset" ${isBusy() ? 'disabled' : ''}>Trainingsdaten zurücksetzen ${icon('refresh')}</button></div></section></div>`;
 }
 
 let missionRotationTimer;
@@ -166,21 +330,23 @@ function render() {
   if (state.busy && !pending) statusTimer = setTimeout(() => refresh().catch(error => toast(error.message, true)), 1500);
   replaceHtml(document.querySelector('#navigation'), views.filter(([id]) => !['profile', 'ranks'].includes(id)).map(([id, label, sym], i) => `${i === 6 ? '<div class="nav-divider"></div>' : ''}<button class="nav-button ${currentView === id ? 'active' : ''}" data-view="${id}" title="${label}" ${currentView === id ? 'aria-current="page"' : ''}>${icon(sym)}<span>${label}</span>${id === 'simulation' && active() ? '<span class="nav-count">1</span>' : ''}</button>`).join(''));
   document.querySelector('#page-title').textContent = views.find(v => v[0] === currentView)?.[1] || 'Übersicht';
-  document.querySelector('#sidebar-level').textContent = levels[(state.level || 3) - 1];
+  document.querySelector('#sidebar-level').textContent = state.game?.ranked?.name || 'IT-Support 1';
   document.querySelector('#connection').className = `connection ${state.auth?.available ? '' : 'offline'}`;
   replaceHtml(document.querySelector('#connection'), `<span class="small-dot"></span>${state.auth?.available ? 'ChatGPT verbunden' : 'ChatGPT nicht verbunden'}`);
   replaceHtml(document.querySelector('#refresh'), icon('refresh'));
   document.querySelector('#refresh').disabled = pending;
-  const viewChanged = replaceHtml(main, ({ menu: mainMenu, ranks: ranksScreen, profile: companionProfile, missions: missionsPanel, battlepass: progressionPass, mastery: progressionMastery, overview, simulation, speedrun, career, reports, settings }[currentView] || overview)());
+  const viewChanged = replaceHtml(main, ({ menu: mainMenu, casino: typeof casinoScreen === 'function' ? casinoScreen : overview, leaderboard: typeof leaderboardScreen === 'function' ? leaderboardScreen : overview, ranks: ranksScreen, profile: companionProfile, missions: missionsPanel, battlepass: progressionPass, mastery: progressionMastery, overview, simulation, speedrun, career, reports, settings }[currentView] || overview)());
   renderCompanionDock();
   if (viewChanged) mountMenuMotion();
+  if (typeof mountArcaneViews === 'function') mountArcaneViews();
   renderArrivals();
   replaceHtml(document.querySelector('#play-header'), gameNavigation());
+  if (typeof window.mountPassExtras === 'function') window.mountPassExtras();
   updateAudioControls();
   if (viewChanged || window.matchMedia('(prefers-reduced-motion: reduce)').matches) animateDebrief();
   if (viewChanged && currentView === 'simulation') { const log = document.querySelector('#messages'); if (log) log.scrollTop = log.scrollHeight; }
 }
-function navigate(view) { if (!views.some(v => v[0] === view)) view = 'menu'; if (state?.game?.companionChosen === false) view = 'profile'; const changed=currentView!==view; currentView = view; if (location.hash !== `#${view}`) history.replaceState(null, '', `#${view}`); render(); if(changed) main.scrollTo({top:0,left:0,behavior:'instant'}); if(changed && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) main.animate([{opacity:.25,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0)'}],{duration:320,easing:'ease-out'}); }
+function navigate(view) { if (!views.some(v => v[0] === view)) view = 'menu'; if (state?.game?.companionChosen === false) view = 'profile'; const changed=currentView!==view; currentView = view; if (location.hash !== `#${view}`) history.replaceState(null, '', `#${view}`); render(); if(changed) {main.scrollTo({top:0,left:0,behavior:'instant'});window.GameAudio?.play('navigate');window.ArcaneFX?.emit('portal');} if(changed && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) main.animate([{opacity:.25,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0)'}],{duration:320,easing:'ease-out'}); }
 async function refresh() { acceptState(await api('state')); render(); }
 async function mutate(path, body, success) {
   if (isBusy()) return;
@@ -198,6 +364,7 @@ async function start(mode = 'career', options = {}) {
 }
 async function send(message) {
   if (!message.trim() || isBusy() || !active()) return;
+  window.GameAudio?.play('spell'); window.ArcaneFX?.emit('spell');
   const previous = message;
   draft = '';
   pending = true; render();
@@ -209,7 +376,7 @@ document.addEventListener('click', async event => {
   const target = event.target.closest('button, a[data-view]');
   if (!target || target.disabled) return;
   try {
-    if (!['sound', 'sound-test'].includes(target.dataset.action)) window.GameAudio?.play('click');
+    if (!target.dataset.view && !['sound', 'sound-test'].includes(target.dataset.action)) window.GameAudio?.play(target.dataset.action==='ability'?'spell':target.dataset.progressionEquip?'equip':'click');
     if (target.dataset.view) { selectedReport = null; navigate(target.dataset.view); return; }
     if (target.dataset.switch) { await switchTicket(target.dataset.switch); return; }
     if (target.dataset.dismissArrival) { arrivalNotices = arrivalNotices.filter(item => item.number !== target.dataset.dismissArrival); renderArrivals(); return; }

@@ -110,6 +110,11 @@ body.has-companion-dock{--companion-rail:216px;padding-left:var(--companion-rail
 @keyframes astral-sweep{0%,15%{transform:translateX(-45%);opacity:0}40%,60%{opacity:1}85%,100%{transform:translateX(45%);opacity:0}}
 @media(prefers-reduced-motion:reduce){.progression-art.frame-astral,.progression-avatar.frame-astral,.frame-astral>img,.frame-astral .eternal-preview-core,.astral-halo,.astral-light-sweep{animation:none!important;will-change:auto}.frame-astral>img{transform:none}.astral-light-sweep{display:none}}
 @media(min-width:651px) and (max-width:850px){.companion-profile .profile-showcase{grid-template-columns:150px minmax(0,1fr);gap:20px}.profile-showcase .avatar-hero{width:150px;height:200px}.profile-showcase .profile-portrait{align-self:start}.profile-equipped{gap:14px}.profile-equipped>span{font-size:15px}}
+/* A shared preview area keeps companion and title rewards aligned. */
+.pass-paged .pass-reward-preview{display:grid;place-items:center;width:100%;height:200px;flex:none;margin:11px 0 9px;min-width:0}
+.pass-paged .pass-reward-preview>.progression-art{margin:0;max-width:100%}
+:root body .pass-paged .pass-reward-preview>.progression-art:has(>.pixel-sprite){width:150px;height:200px}
+.pass-paged .progression-tier h4{min-height:2.7em;display:grid;align-items:center;overflow-wrap:anywhere}
 /* Battlepass trophies: bespoke emblems and title effects travel with the reward. */
 .pass-emblem{--em-accent:#9de6d3;--em-glow:#66d7c466;color:var(--em-accent);background:radial-gradient(ellipse at 50% 42%,#21473e,#0a1524 70%);border-color:#537568;border-radius:12px}
 .pass-emblem.emblem-rare{--em-accent:#85dfff;--em-glow:#35c5ff66;background:radial-gradient(ellipse at 50% 42%,#1c3d57,#091323 70%);border-color:#377d9f}
@@ -255,3 +260,10 @@ body.has-companion-dock{--companion-rail:216px;padding-left:var(--companion-rail
 .character-breakout.breakout-raven{--creature-glow:#659cff;--creature-scene:#142b55}
 .character-breakout.breakout-snake-coral{--creature-glow:#ff948b;--creature-scene:#46212e}
 .character-breakout.breakout-chimera{--creature-glow:#cb97ff;--creature-scene:#301e4d}
+
+/* Pixel portraits are absolutely positioned by pixel.css, so give their profile frame real height. */
+.companion-profile .companion-choice-art{display:grid;place-items:center;height:280px;min-height:280px;box-sizing:border-box;flex:none}
+.companion-profile .companion-choice-art img{width:auto;max-width:100%;height:260px;aspect-ratio:3/4;object-fit:contain}
+.companion-profile .companion-choice .companion-choice-art>.pixel-sprite{position:relative;inset:auto;width:auto;height:260px;aspect-ratio:3/4;left:auto;top:auto}
+@media(max-width:850px){.companion-profile .companion-choice-art{height:240px;min-height:240px}.companion-profile .companion-choice-art img,.companion-profile .companion-choice .companion-choice-art>.pixel-sprite{height:220px}}
+@media(max-width:650px){.companion-profile .companion-choice-art{height:220px;min-height:220px}.companion-profile .companion-choice-art img,.companion-profile .companion-choice .companion-choice-art>.pixel-sprite{height:200px}}

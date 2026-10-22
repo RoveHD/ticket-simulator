@@ -56,7 +56,7 @@ function difficultyCard(level, id = '') {
 function gameProgress(full = false) {
   const game = state.game;
   if (!game) return '';
-  const rank = game.ranked || {index:0,name:'IT-Support',rr:0,progress:0,nextName:'Fortgeschrittener IT-Support'};
+  const rank = game.ranked || {index:0,tierIndex:0,division:1,name:'IT-Support 1',rr:0,progress:0,nextName:'IT-Support 2'};
   return `<section class="command-progress" aria-label="Dein Spielfortschritt">${grandRankBadge(rank)}<div class="rank-copy"><span class="eyebrow">DEIN EINSATZRANG</span><h2>${esc(rank.name)}</h2><div class="rank-meter"><progress max="100" value="${rank.progress}" aria-label="Fortschritt zum nächsten Einsatzrang"></progress><span>${rank.rr} / 100 RR</span></div><small>${rank.nextName ? `Noch ${100 - rank.rr} RR bis ${esc(rank.nextName)}` : 'Höchster Einsatzrang erreicht'}</small></div><div class="game-stat"><strong>${game.streak}</strong><span>Karrierefälle in Folge gelöst</span></div><div class="game-stat"><strong>${game.missions.filter(m => m.unlocked).length} / ${game.missions.length}</strong><span>Missionen erfüllt</span></div></section>${full ? missionsPanel() : ''}`;
 }
 

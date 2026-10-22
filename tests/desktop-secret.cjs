@@ -79,7 +79,7 @@ async function checkCase(name, archives) {
           acceptState(await api('cosmetics',{kind:'portrait',id}));render();
           const img=document.querySelector('.profile-portrait img');await img.decode();
           const suffix=['eternal','astral'].includes(frame)?'-lord-breakout.png':'-lord.png';
-          if(!img.src.endsWith('/characters/chimera'+suffix))throw Error('Falsches Lord-Porträt: '+frame);
+          if(!img.src.endsWith('/characters/pixel-atlas-secret.png')||img.parentElement.dataset.variant!=='lord')throw Error('Falsches Lord-Porträt: '+frame);
           if(!document.querySelector('.profile-portrait .frame-'+frame))throw Error('Form fehlt: '+frame);
         }
       })()`);
@@ -99,7 +99,7 @@ async function checkCase(name, archives) {
         const snake=state.game.companionMasteries.snake.find(m=>m.id==='dhcp');
         if(wolf.solved!==50||snake.solved!==0||!wolf.lordUnlocked)throw Error('Tierfortschritte vermischt');
         const card=document.querySelector('#mastery-dhcp');
-        if(!card.textContent.includes('Wolf · 50 EIGENE FÄLLE')||!card.querySelector('.mastery-animal-portrait img').src.endsWith('wolf-lord.png'))throw Error('Wolfmeisterung oder Bild fehlt');
+        if(!card.textContent.includes('Wolf · 50 EIGENE FÄLLE')||card.querySelector('.mastery-animal-portrait .pixel-sprite').dataset.variant!=='lord')throw Error('Wolfmeisterung oder Bild fehlt');
         if(!state.game.inventory.some(r=>r.id==='title-lord-dhcp')||state.game.inventory.some(r=>r.id==='portrait-snake-lord-dhcp'))throw Error('Titel/Formen-Trennung fehlt');`);
       for(const width of [1440,850]){
         win.setSize(width,960);

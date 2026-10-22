@@ -57,7 +57,7 @@ async function start() {
   const rendererErrors = [];
   win = new BrowserWindow({
     title: 'Ticket Simulator', width: 1440, height: 960, minWidth: 850, minHeight: 650,
-    show: false, backgroundColor: nativeTheme.shouldUseDarkColors ? '#080d1c' : '#eef2fa', autoHideMenuBar: true,
+    show: false, backgroundColor: nativeTheme.shouldUseDarkColors ? '#161329' : '#eee3c5', autoHideMenuBar: true,
     icon: nativeImage.createFromPath(path.join(assetsRoot, 'assets', 'icon.png')),
     webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webviewTag: false, spellcheck: false, backgroundThrottling: !smoke },
   });
@@ -99,7 +99,7 @@ async function start() {
         observer.observe(document.body,{childList:true,subtree:true});
         const timer=setTimeout(()=>{observer.disconnect();reject(new Error('UI wurde nicht bereit: '+document.body.innerText.slice(-1800)));},15000);
       })`);
-      if (result.navigation !== 10 || result.nodeExposed || result.contentWidth > result.width || result.reducedMotion) throw new Error('Desktop-Oberfläche, Isolation oder Animations-Testbasis ungültig.');
+      if (result.navigation !== 12 || result.nodeExposed || result.contentWidth > result.width || result.reducedMotion) throw new Error('Desktop-Oberfläche, Isolation oder Animations-Testbasis ungültig.');
       if (rendererErrors.length) throw new Error(rendererErrors.join('\n'));
       const painted = () => win.webContents.executeJavaScript('new Promise(resolve => requestAnimationFrame(() => { for(const animation of document.getAnimations()) { if(animation.effect?.getTiming().iterations!==Infinity) animation.finish(); } requestAnimationFrame(resolve); }))');
       await painted();
@@ -108,9 +108,10 @@ async function start() {
       const appearance = await win.webContents.executeJavaScript(`({
         theme:document.documentElement.dataset.theme,
         background:getComputedStyle(document.documentElement).backgroundColor,
-        navigationFont:getComputedStyle(document.querySelector('.nav-button')).fontSize
+        navigationFont:getComputedStyle(document.querySelector('.nav-button')).fontSize,
+        headingFont:getComputedStyle(document.querySelector('h1')).fontFamily
       })`);
-      if (appearance.theme !== 'dark' || appearance.background !== 'rgb(8, 13, 28)' || parseFloat(appearance.navigationFont) < 16 || !nativeTheme.shouldUseDarkColors) throw new Error('Dunkler Modus oder Schriftgröße fehlt.');
+      if (appearance.theme !== 'dark' || appearance.background !== 'rgb(22, 19, 41)' || !appearance.headingFont.includes('Pixel Arcade') || parseFloat(appearance.navigationFont) < 16 || !nativeTheme.shouldUseDarkColors) throw new Error('Pixel-Darstellung, dunkler Modus oder Schriftgröße fehlt.');
       const initialCompanion = await require('../tests/desktop-play.cjs').chooseInitialCompanion(win.webContents);
       if (initialCompanion.companion !== 'dragon' || initialCompanion.level !== 1 || initialCompanion.canSwitch) throw new Error('Pflicht-Begleiterwahl oder Maximalstufen-Sperre fehlerhaft.');
       await win.webContents.executeJavaScript('navigate("menu")');

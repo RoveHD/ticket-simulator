@@ -29,3 +29,23 @@ body:not([data-screen="menu"]) #main>.mission-heading,body:not([data-screen="men
 .command-progress{grid-template-columns:110px minmax(0,1fr) auto auto}.command-progress>.grand-rank{width:100px;height:110px}.legacy-achievements{margin:20px 0;color:var(--muted)}.legacy-achievements summary{cursor:pointer;padding:15px;border:1px solid var(--line)}.profile-quick{display:flex;gap:12px;align-items:center;border:0;background:none;color:var(--ink);text-align:left;padding:0}.profile-quick>span:not(.progression-avatar){max-width:160px;font-size:12px}.profile-quick small{font-size:10px}.menu-companion{position:absolute;right:25px;top:70px;display:flex;align-items:center;gap:15px;background:#0d152be8;border:1px solid #60528e;padding:14px 20px;color:var(--ink);z-index:2;text-align:left}.menu-companion small{display:block;color:var(--muted);font:9px Consolas,monospace;letter-spacing:1px;margin-top:8px}.menu-companion .progression-avatar.avatar-large{width:62px;height:72px;border-radius:8px}.menu-rank>.grand-rank{width:85px;height:92px;flex:none}.result-progression{position:relative;display:flex;flex-wrap:wrap;gap:16px;justify-content:center;border-top:1px solid #59536a;padding-top:20px;margin-top:22px}.result-progression>div{padding:10px 15px;background:#211b35;border:1px solid #6c538e}.result-progression span{display:block;font:10px Consolas,monospace;color:#c4accd;margin-bottom:6px}.result-progression strong{font-size:14px;color:#f0d59c}.result-progression p{width:100%;text-align:center;color:#dfc4ff;font-size:12px;line-height:1.6}.result-progression>.text-button{width:100%}
 @media(max-width:1180px){.profile-quick>span:not(.progression-avatar){display:none}.command-progress{grid-template-columns:90px minmax(0,1fr) auto auto}}
 @media(max-width:690px){.command-progress{grid-template-columns:85px minmax(0,1fr)}.command-progress>.grand-rank{width:80px;height:96px}.menu-companion{top:50px;right:12px;padding:8px;font-size:12px}.menu-companion .progression-avatar.avatar-large{width:45px;height:52px}}
+/* Six stable navigation entries; detailed destinations open on demand. */
+#play-header{position:relative;z-index:30;gap:20px;flex-wrap:wrap}
+#play-header .play-tabs{display:flex;flex-wrap:wrap;gap:3px;order:0;flex:1 1 auto;width:auto;max-width:none;overflow:visible;justify-content:flex-start}
+#play-header .play-tabs>button,#play-header .play-nav-toggle{display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:12px 10px;white-space:nowrap}
+.play-nav-group{position:relative;flex:none}
+#play-header .play-nav-group.is-current>.play-nav-toggle,#play-header .play-nav-toggle[aria-expanded="true"]{background:var(--lift);color:var(--gold)}
+#play-header .play-nav-group.is-current>.play-nav-toggle::after{transform:scaleX(1)}
+.play-nav-chevron{font:18px/1 Consolas,monospace;transition:transform .15s}
+.play-nav-toggle[aria-expanded="true"] .play-nav-chevron{transform:rotate(180deg)}
+#play-header .play-nav-menu{position:absolute;top:calc(100% + 8px);left:0;width:290px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 210px);overflow:auto;padding:8px;border:2px solid var(--line);background:var(--paper);color:var(--ink);box-shadow:5px 5px 0 #090814;z-index:40}
+#play-header .play-nav-menu[hidden]{display:none}
+.play-nav-caption{display:block;padding:8px 12px 12px;color:var(--muted);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--line);margin-bottom:4px}
+#play-header .play-nav-menu button{display:block;width:100%;padding:11px 12px;text-align:left;font:600 15px/1.5 var(--pixel-body,Consolas,monospace);white-space:normal;border-left:3px solid transparent}
+#play-header .play-nav-menu button small{display:block;margin-top:3px;color:var(--muted);font-size:12px;font-weight:400;line-height:1.5}
+#play-header .play-nav-menu button::after{display:none}
+#play-header .play-nav-menu button[aria-current]{border-left-color:var(--gold)}
+#play-header .play-profile{gap:12px;margin-left:auto}
+@media(max-width:1300px){#play-header .play-tabs{order:3;flex-basis:100%;width:100%}}
+@media(max-width:950px){#play-header .play-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}#play-header .play-nav-group{min-width:0}#play-header .play-nav-toggle{width:100%}#play-header .play-tabs>button,#play-header .play-nav-toggle{font-size:11px;padding:10px 4px}}
+@media(prefers-reduced-motion:reduce){.play-nav-chevron{transition:none}}

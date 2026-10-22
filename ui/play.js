@@ -41,9 +41,53 @@ function animateDebrief() {
   resultFrame=requestAnimationFrame(frame);
 }
 function gameNavigation() {
-  const tabs = [['overview','Leitstelle'],['simulation','Einsatz'],['speedrun','Speedrun'],['missions','Missionen'],['battlepass','Battlepass'],['mastery','Meisterung'],['career','Karriere'],['reports','Berichte'],['settings','Optionen']];
-  return `<a class="play-brand" href="#menu" aria-label="Zum Hauptmenü">TS<span>HAUPTMENÜ<small>ESC / ZURÜCK</small></span></a><nav class="play-tabs" aria-label="Spielnavigation">${tabs.map(([id,label]) => `<button data-view="${id}" ${currentView===id?'aria-current="page"':''}>${label}</button>`).join('')}</nav><div class="play-profile"><div data-sound-control>${soundButton()}</div>${profileQuickButton()}</div>`;
+  const link = (id, label, description = '') => `<button type="button" data-view="${id}" ${currentView === id ? 'aria-current="page"' : ''}><span>${label}</span>${description ? `<small>${description}</small>` : ''}</button>`;
+  const group = (id, label, items) => `<div class="play-nav-group ${items.some(([view]) => view === currentView) ? 'is-current' : ''}" data-nav-group="${id}"><button type="button" class="play-nav-toggle" data-nav-toggle="${id}" aria-expanded="false" aria-controls="play-nav-${id}"><span>${label}</span><span class="play-nav-chevron" aria-hidden="true">⌄</span></button><div class="play-nav-menu" id="play-nav-${id}" aria-label="${label}" hidden><span class="play-nav-caption">${label}</span>${items.map(item => link(...item)).join('')}</div></div>`;
+  return `<a class="play-brand" href="#menu" aria-label="Zum Hauptmenü">TS<span>HAUPTMENÜ<small>ESC / ZURÜCK</small></span></a><nav class="play-tabs" aria-label="Spielnavigation">${link('overview','Leitstelle')}${group('play','Spielen', [['simulation','Einsatz','Ein Ticket bearbeiten'],['speedrun','Speedrun','Eine ganze Schicht übernehmen']])}${group('progress','Fortschritt', [['missions','Missionen','Tägliche und dauerhafte Ziele'],['battlepass','Battlepass','Stufen und Belohnungen'],['mastery','Meisterung','Begleiterformen und Fachgebiete'],['career','Karriere','Deine persönliche Entwicklung'],['ranks','Ränge','Alle 18 Rangstufen']])}${group('results','Auswertung', [['reports','Berichte','Abgeschlossene Einsätze nachlesen'],['leaderboard','Rekorde','Karriere und Speedruns vergleichen']])}${link('casino','Casino')}${link('settings','Optionen')}</nav><div class="play-profile"><div data-sound-control>${soundButton()}</div>${profileQuickButton()}</div>`;
 }
+
+function closePlayMenus(restoreFocus = false) {
+  const buttons = [...document.querySelectorAll('.play-nav-toggle[aria-expanded="true"]')];
+  for (const button of buttons) {
+    button.setAttribute('aria-expanded', 'false');
+    document.getElementById(button.getAttribute('aria-controls')).hidden = true;
+  }
+  if (restoreFocus) buttons[0]?.focus();
+  return buttons.length > 0;
+}
+function openPlayMenu(button) {
+  closePlayMenus();
+  const panel = document.getElementById(button.getAttribute('aria-controls'));
+  button.setAttribute('aria-expanded', 'true'); panel.hidden = false;
+  panel.style.left = '0px';
+  const bounds = panel.getBoundingClientRect();
+  panel.style.left = `${Math.max(12 - bounds.left, Math.min(0, window.innerWidth - 12 - bounds.right))}px`;
+  return panel;
+}
+document.addEventListener('click', event => {
+  const toggle = event.target.closest('[data-nav-toggle]');
+  if (toggle) {
+    if (toggle.getAttribute('aria-expanded') === 'true') closePlayMenus();
+    else openPlayMenu(toggle);
+  } else if (!event.target.closest('.play-nav-group') || event.target.closest('.play-nav-menu [data-view]')) closePlayMenus();
+});
+document.addEventListener('keydown', event => {
+  const toggle = event.target.closest('[data-nav-toggle]');
+  if (toggle && ['ArrowDown', 'ArrowUp'].includes(event.key)) {
+    event.preventDefault(); const links = openPlayMenu(toggle).querySelectorAll('button');
+    links[event.key === 'ArrowUp' ? links.length - 1 : 0]?.focus(); return;
+  }
+  const panel = event.target.closest('.play-nav-menu');
+  if (!panel || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault(); const links = [...panel.querySelectorAll('button')], index = links.indexOf(document.activeElement);
+  const next = event.key === 'Home' ? 0 : event.key === 'End' ? links.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : -1) + links.length) % links.length;
+  links[next]?.focus();
+});
+document.addEventListener('focusout', event => {
+  const group = event.target.closest('.play-nav-group');
+  if (group) queueMicrotask(() => { if (!group.contains(document.activeElement)) closePlayMenus(); });
+});
+window.addEventListener('resize', () => closePlayMenus());
 
 function actionDeck() {
   return `${companionPassivePanel()}<form class="composer action-console" id="message-form"><div class="console-title"><label for="message">DEIN ZUG</label></div><textarea id="message" name="message" maxlength="16000" placeholder="Beschreibe deine Aktion oder gib einen simulierten Befehl ein …" ${isBusy()?'disabled':''}>${esc(draft)}</textarea><div class="composer-bottom"><small>Enter ausführen · Shift + Enter neue Zeile</small><button class="button primary deploy-action" type="submit" ${isBusy()?'disabled':''}>Aktion ausführen ${icon('send')}</button></div></form>`;

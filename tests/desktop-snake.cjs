@@ -20,16 +20,22 @@ module.exports = async (win, directory, painted) => {
         const frame=document.querySelector('.profile-portrait .breakout-snake'), creature=frame?.querySelector('.portrait-creature'),bg=frame?.querySelector('.portrait-scene-background');
         if(!creature||!bg)throw Error('Getrennte Schlangenebenen fehlen');
         const canvas=document.createElement('canvas');canvas.width=100;canvas.height=100;
-        const ctx=canvas.getContext('2d');ctx.drawImage(creature,0,0,100,100);
+        const sheet=creature.querySelector('img'),css=getComputedStyle(creature);
+        const col=Number(css.getPropertyValue('--sprite-col')),row=Number(css.getPropertyValue('--sprite-row')),rows=Number(css.getPropertyValue('--sprite-rows'));
+        const cellWidth=sheet.naturalWidth/2,cellHeight=sheet.naturalHeight/rows;
+        const ctx=canvas.getContext('2d');ctx.drawImage(sheet,col*cellWidth+cellWidth*.04,row*cellHeight,cellWidth*.92,cellHeight,0,0,100,100);
         const pixels=ctx.getImageData(0,0,100,100).data;let transparent=0,solid=0;
         for(let i=3;i<pixels.length;i+=4){if(pixels[i]===0)transparent++;if(pixels[i]>240)solid++;}
         if(transparent<1000||solid<1000)throw Error('Schlange ist nicht sauber freigestellt');
         if(creature.getBoundingClientRect().top>=frame.getBoundingClientRect().top-8)throw Error('Schlange ragt nicht über den Rahmen');
         if(getComputedStyle(frame).overflowY!=='visible')throw Error('Rahmen schneidet den Kopf ab');
         const motion=creature.getAnimations().find(a=>a.animationName.startsWith('creature-'));
-        if(!motion||motion.playState!=='running')throw Error('Schlange bewegt sich nicht');
-        const bgBefore=bg.getBoundingClientRect().toJSON();motion.currentTime=0;const before=getComputedStyle(creature).transform;motion.currentTime=3000;
-        if(before===getComputedStyle(creature).transform)throw Error('Schlangenbewegung unverändert');
+        if('${tier}'==='eternal') {
+          if(motion||css.animationName!=='none'||css.transform!=='none')throw Error('Ewige Schlange muss statisch bleiben');
+        } else if(!motion||motion.playState!=='running')throw Error('Astrale Schlange bewegt sich nicht');
+        const bgBefore=bg.getBoundingClientRect().toJSON();
+        if(motion){motion.currentTime=0;const before=getComputedStyle(creature).transform;motion.currentTime=3000;
+          if(before===getComputedStyle(creature).transform)throw Error('Astrale Schlangenbewegung unverändert');}
         if(bg.getAnimations({subtree:true}).length||getComputedStyle(bg).transform!=='none'||JSON.stringify(bgBefore)!==JSON.stringify(bg.getBoundingClientRect().toJSON()))throw Error('Hintergrund bewegt sich mit');
         if(!document.querySelector('#companion-dock .breakout-snake .portrait-creature'))throw Error('Freistellung fehlt im Dock');
         const dock=document.querySelector('#companion-dock');if(dock.scrollWidth>dock.clientWidth)throw Error('Schlange erzeugt horizontalen Dock-Scrollbalken');

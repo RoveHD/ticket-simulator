@@ -16,6 +16,25 @@ const queue = [
   { number: 'S03', title: 'Drucken', requester: 'Ben', department: 'Empfang', priority: 'P2', status: 'solved', age: 2, arrivalMinute: 10, remaining: 58, active: false },
 ];
 
+test('grouped navigation keeps all destinations and marks the current destination within its group', () => {
+  const run = ui();
+  run('state={game:{},audio:{}}');
+  const groups = { simulation: 'play', speedrun: 'play', missions: 'progress', battlepass: 'progress',
+    mastery: 'progress', career: 'progress', ranks: 'progress', reports: 'results', leaderboard: 'results' };
+  for (const view of ['overview', ...Object.keys(groups), 'casino', 'settings']) {
+    run('currentView=input', view);
+    const html = run('gameNavigation()');
+    for (const destination of ['overview', ...Object.keys(groups), 'casino', 'settings', 'profile']) {
+      assert.ok(html.includes(`data-view="${destination}"`), destination);
+    }
+    assert.equal((html.match(/data-nav-toggle=/g) || []).length, 3);
+    assert.equal((html.match(/aria-current="page"/g) || []).length, 1);
+    assert.match(html, new RegExp(`data-view="${view}" aria-current="page"`));
+    if (groups[view]) assert.match(html, new RegExp(`class="play-nav-group is-current" data-nav-group="${groups[view]}"`));
+    else assert.doesNotMatch(html, /play-nav-group is-current/);
+  }
+});
+
 test('passive ticket assistance renders automatically from the draft without altering the session', () => {
   const run = ui();
   run('state={session:{status:"active",ticket:{number:"1001",title:"Dienst ausgefallen"},messages:[]},game:{characters:[{id:"dragon"}],companion:{activeId:"dragon"}}};draft="Restart-Computer -ComputerName DC01"');
@@ -67,26 +86,49 @@ test('companion ability control follows authoritative readiness, cooldown and ac
   assert.equal(run('state={game:{}};companionAbilityPanel()'), '');
 });
 
-test('rank overview shows the six career ranks, real RR thresholds and exactly one current rank', () => {
+test('rank overview groups all eighteen divisions in six ranks with real thresholds and one current rank', () => {
   const run = ui();
-  const { ranked } = require('../server/ranked');
+  const { ranked, rankView } = require('../server/ranked');
   const rank = ranked([]);
   run('state={game:{ranked:input}}', rank);
   const before = run('JSON.stringify(state)');
   const html = run('ranksScreen()');
   assert.equal((html.match(/class="rank-tier /g) || []).length, 6);
+  assert.equal((html.match(/class="rank-division /g) || []).length, 18);
   assert.equal((html.match(/aria-current="step"/g) || []).length, 1);
   for (const item of rank.ranks) {
     assert.ok(html.includes(item.name));
     assert.ok(html.includes(`AB ${item.index * rank.rules.rrPerRank} GESAMT-RR`));
   }
-  assert.match(html, /Noch 100 RR bis Fortgeschrittener IT-Support/);
+  assert.match(html, /Noch 100 RR bis IT-Support 2/);
+  assert.match(html, /Auf Rang 1–3 gibt es ab 70 Punkten einen Einstiegsbonus und kleinere Abzüge/);
   assert.equal(run('JSON.stringify(state)'), before);
-  run('state.game.ranked={...input,index:5,rr:100,totalRr:600}', rank);
+  run('state.game.ranked={...state.game.ranked,...input}', rankView(1800));
   const maximum = run('ranksScreen()');
   assert.equal((maximum.match(/aria-current="step"/g) || []).length, 1);
   assert.match(maximum, /höchsten Einsatzrang erreicht/);
   assert.doesNotMatch(maximum, /Noch .* RR bis/);
+});
+
+test('career path and emblems show each individual division without using the training difficulty', () => {
+  const run = ui();
+  const { ranked, rankView } = require('../server/ranked');
+  for (let index = 0; index < 18; index++) {
+    const rank = { ...ranked([]), ...rankView(index * 100) };
+    run('state={level:6,game:{ranked:input}}', rank);
+    const html = run('careerRankTrack()');
+    assert.equal((html.match(/class="career-division /g) || []).length, 18);
+    assert.equal((html.match(/aria-current="step"/g) || []).length, 1);
+    assert.ok(html.includes(`Dein aktueller Rang: ${rank.name}`));
+    const emblem = run('grandRankBadge(state.game.ranked)');
+    assert.ok(emblem.includes(`grand-rank-${rank.tierIndex}`));
+    assert.equal((emblem.match(/<i aria-hidden="true">/g) || []).length, rank.division);
+    assert.ok(emblem.includes(`<strong>${rank.division}</strong>`));
+    assert.match(run('metrics()'), /\/ 18/);
+    assert.ok(run('metrics()').includes(rank.name));
+  }
+  run('state={game:{}}');
+  assert.equal((run('ranksScreen()').match(/class="rank-division /g) || []).length, 18);
 });
 test('queue sorts and filters independently of the active ticket and never interprets markup', () => {
   const run = ui();

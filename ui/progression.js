@@ -64,6 +64,15 @@ function progressionCharacterImage(id, lord = false) {
   const character = progressionCharacterById(id);
   return character ? (lord ? character.lordImage : character.baseImage) : '';
 }
+function progressionPixelSprite(id, lord = false, extraClass = '') {
+  if (progressionSecretLocked(id)) return '';
+  const cells = { snake:['a',0],wolf:['a',1],dragon:['b',0],'snake-coral':['b',1],fox:['c',0],
+    'wolf-night':['c',1],raven:['d',0],'dragon-frost':['d',1],chimera:['secret',0] };
+  if (!Object.hasOwn(cells,id) || !progressionCharacterById(id)) return '';
+  const [sheet,column] = cells[id], secret = sheet === 'secret';
+  const col = secret ? Number(lord) : column, row = secret ? 0 : Number(lord), rows = secret ? 1 : 2;
+  return `<span class="pixel-sprite ${extraClass}" data-character="${id}" data-variant="${lord ? 'lord' : 'base'}" style="--sprite-col:${col};--sprite-row:${row};--sprite-rows:${rows}"><img class="pixel-sprite-sheet" src="/characters/pixel-atlas-${sheet}.png" alt="" loading="lazy" draggable="false"></span>`;
+}
 function progressionCompanionForms(characterId) { return progressionGame().companionForms?.[characterId]; }
 function progressionPersonalMasteries(characterId) {
   return progressionGame().companionMasteries?.[characterId] || [];
@@ -79,7 +88,7 @@ function progressionMasteryAnimals() {
   return `<div class="mastery-animal-heading"><h3>Dein Tier. Seine Meisterung.</h3><p>Ansehen wechselt deinen Begleiter nicht. Nur dein aktives Tier sammelt neue Formenfortschritte.</p></div><div class="mastery-animals" role="group" aria-label="Meisterung eines Begleiters ansehen">${progressionCharactersCatalog().map(c => {
     if (progressionSecretLocked(c.id)) return `<div class="mastery-animal sealed" aria-label="Geheimer Begleiter, noch unentdeckt">${progressionSecretArt(true)}<strong>???</strong><small>GEHEIM</small></div>`;
     const info = progressionGame().companion?.characters?.find(item => item.id === c.id) || c;
-    return `<button class="mastery-animal ${selected?.id === c.id ? 'selected' : ''}" data-mastery-character="${c.id}" aria-pressed="${selected?.id === c.id}"><img src="${c.baseImage}" alt="" loading="lazy"><strong>${progressionEscape(c.name)}</strong><small>${active === c.id ? 'AKTIVER BEGLEITER' : info?.unlocked ? `Stufe ${info.level || 1}` : 'NOCH GESPERRT'}</small></button>`;
+    return `<button class="mastery-animal ${selected?.id === c.id ? 'selected' : ''}" data-mastery-character="${c.id}" aria-pressed="${selected?.id === c.id}">${progressionPixelSprite(c.id)}<strong>${progressionEscape(c.name)}</strong><small>${active === c.id ? 'AKTIVER BEGLEITER' : info?.unlocked ? `Stufe ${info.level || 1}` : 'NOCH GESPERRT'}</small></button>`;
   }).join('')}</div>`;
 }
 function progressionMasteryBonus(mastery, lordOwned = false) {
@@ -114,46 +123,194 @@ function equippedTitleMarkup() {
   const title = progressionInventory().find(r => r.kind === 'title' && progressionEquipped(r));
   return title ? progressionTitleMarkup(title) : '';
 }
+const progressionPixelEmblems = Object.fromEntries(Object.entries({
+  "spark": [
+    "00011000",
+    "00011000",
+    "00011000",
+    "11111111",
+    "11111111",
+    "00011000",
+    "00011000",
+    "00011000"
+  ],
+  "sentinel": [
+    "11111111",
+    "10000001",
+    "10000001",
+    "10001001",
+    "01011010",
+    "01010010",
+    "00100100",
+    "00011000"
+  ],
+  "comet": [
+    "00000110",
+    "00011110",
+    "00111100",
+    "01111000",
+    "11110000",
+    "11100000",
+    "11000000",
+    "10000000"
+  ],
+  "oracle": [
+    "00011000",
+    "00111100",
+    "01100110",
+    "11011011",
+    "11011011",
+    "01100110",
+    "00111100",
+    "00011000"
+  ],
+  "compass": [
+    "00011000",
+    "00111100",
+    "00011000",
+    "11111111",
+    "11111111",
+    "00011000",
+    "00111100",
+    "00011000"
+  ],
+  "blade": [
+    "00000011",
+    "00000111",
+    "00001110",
+    "01011100",
+    "00111000",
+    "01110000",
+    "11001000",
+    "10000000"
+  ],
+  "aegis": [
+    "11111111",
+    "10000001",
+    "10111101",
+    "10100101",
+    "01100110",
+    "01111110",
+    "00111100",
+    "00011000"
+  ],
+  "reactor": [
+    "00111100",
+    "01100110",
+    "11011011",
+    "10100101",
+    "10100101",
+    "11011011",
+    "01100110",
+    "00111100"
+  ],
+  "eclipse": [
+    "00111100",
+    "01100010",
+    "11000000",
+    "11000000",
+    "11000000",
+    "11000000",
+    "01100010",
+    "00111100"
+  ],
+  "wraith": [
+    "00111100",
+    "01111110",
+    "11011011",
+    "11011011",
+    "11111111",
+    "11111111",
+    "11011011",
+    "10010001"
+  ],
+  "phoenix": [
+    "10011001",
+    "11011011",
+    "01111110",
+    "00111100",
+    "01111110",
+    "01011010",
+    "00011000",
+    "00100100"
+  ],
+  "crown": [
+    "10011001",
+    "11011011",
+    "11111111",
+    "01111110",
+    "01111110",
+    "01111110",
+    "00000000",
+    "00111100"
+  ],
+  "prism": [
+    "00011000",
+    "00111100",
+    "01111110",
+    "11011011",
+    "11011011",
+    "01111110",
+    "00111100",
+    "00011000"
+  ],
+  "void": [
+    "11000011",
+    "11100111",
+    "01111110",
+    "01111110",
+    "00111100",
+    "00100100",
+    "00111100",
+    "00011000"
+  ],
+  "dragon": [
+    "11000011",
+    "11100111",
+    "01111110",
+    "11011011",
+    "11111111",
+    "01100110",
+    "00111100",
+    "00011000"
+  ],
+  "singularity": [
+    "00111100",
+    "01100110",
+    "11000011",
+    "10011001",
+    "10011001",
+    "11000011",
+    "01100110",
+    "00111100"
+  ]
+}).map(([name,rows])=>[name,'<path class="em-pixel" d="'+rows.flatMap((row,y)=>[...row].flatMap((bit,x)=>bit==='1'?['M'+(18+x*8)+' '+(18+y*8)+'h8v8h-8z']:[])).join('')+'"/>']));
 function progressionPassEmblem(reward, compact = false) {
-  const symbols = {
-    spark: '<path d="m50 17 9 23 24 10-24 10-9 23-9-23-24-10 24-10Z"/><path class="em-detail" d="M50 29v42M29 50h42"/>',
-    sentinel: '<path d="m50 17 25 10v23c0 16-15 27-25 33-10-6-25-17-25-33V27Z"/><path class="em-detail" d="m39 51 8 8 16-19M50 27v9"/>',
-    comet: '<path d="m76 21-16 41-19 17-17-18 17-19Z"/><path class="em-detail" d="m38 51 11 11M26 35l14-14M19 48l11-11M52 80l13-13"/><circle class="em-core" cx="43" cy="59" r="7"/>',
-    oracle: '<path d="M15 50q35-38 70 0-35 38-70 0Z"/><path class="em-detail" d="m50 14 7 11-7 11-7-11ZM50 65v19"/><circle class="em-core" cx="50" cy="50" r="11"/>',
-    compass: '<path d="m50 12 9 29 29 9-29 9-9 29-9-29-29-9 29-9Z"/><path class="em-detail" d="m28 28 44 44M72 28 28 72"/><circle class="em-core" cx="50" cy="50" r="7"/>',
-    blade: '<path d="m69 14 6 22-28 28-11-11Z"/><path class="em-detail" d="m27 49 24 24M35 62 21 77l4 4 15-15M43 52l20-20"/>',
-    aegis: '<path d="M50 13 80 30 73 62 50 87 27 62 20 30Z"/><path class="em-detail" d="m50 24 19 12-5 21-14 17-14-17-5-21ZM50 35v28M38 49h24"/>',
-    reactor: '<path d="m50 16 29 17v34L50 84 21 67V33Z"/><path class="em-detail" d="m50 29 18 11v20L50 71 32 60V40ZM21 33l11 7m36 0 11-7M50 71v13"/><circle class="em-core" cx="50" cy="50" r="10"/>',
-    eclipse: '<path d="m50 11 6 19 16-11-6 20 23 11-23 11 6 20-16-11-6 19-6-19-16 11 6-20-23-11 23-11-6-20 16 11Z"/><circle class="em-dark" cx="50" cy="50" r="20"/><path class="em-detail" d="M50 33a17 17 0 0 1 0 34"/>',
-    wraith: '<path d="M50 15 72 33 76 66 62 59 60 83 50 72 40 83 38 59 24 66 28 33Z"/><path class="em-detail" d="m35 42 10 7m20-7-10 7M42 60h16"/>',
-    phoenix: '<path d="m50 82-13-24-20-5L8 25l29 16-8-23 21 16 21-16-8 23 29-16-9 28-20 5Z"/><path class="em-detail" d="m21 40 23 12 6 18 6-18 23-12M50 19v15"/><path class="em-core" d="m50 37 7 10-7 12-7-12Z"/>',
-    crown: '<path d="M21 34 36 46 50 19 64 46 79 34 71 72H29Z"/><path class="em-detail" d="M29 64h42M34 78h32"/><path class="em-core" d="m50 43 7 9-7 9-7-9Z"/>',
-    prism: '<path d="m50 13 29 27-9 31-20 17-20-17-9-31Z"/><path class="em-detail" d="m50 13 12 27-12 48-12-48ZM21 40h58M30 71l20-16 20 16"/>',
-    void: '<path d="m12 27 23 14 15-29 15 29 23-14-12 44H24Z"/><path class="em-detail" d="M26 78h48M28 62h44"/><path class="em-core" d="m50 34 11 14-11 15-11-15Z"/><circle class="em-detail" cx="50" cy="48" r="23"/>',
-    dragon: '<path d="m16 24 22 9L50 12l5 22 24-7-9 21 12 11-23 12-9 17-9-17-22-12 12-13Z"/><path class="em-detail" d="m35 45 10 5m20-5-10 5M40 64l10 7 10-7M50 50v12"/><path class="em-core" d="m45 31 5-8 5 8-5 10Z"/>',
-    singularity: '<path d="m50 23 14 14 13 13-13 13-14 14-14-14-13-13 13-13Z"/><ellipse class="em-detail" cx="50" cy="50" rx="39" ry="16" transform="rotate(-32 50 50)"/><ellipse class="em-detail" cx="50" cy="50" rx="39" ry="16" transform="rotate(32 50 50)"/><circle class="em-dark" cx="50" cy="50" r="13"/><circle class="em-core" cx="50" cy="50" r="5"/>',
-  };
+  const symbols = progressionPixelEmblems;
   const emblem = Object.hasOwn(symbols, reward.emblem) ? reward.emblem : 'spark';
   const rarity = progressionRarity[reward.rarity]?.[1] || 'common';
   const animated = ['epic','legendary','mythic'].includes(rarity);
-  return `<div class="progression-art pass-emblem emblem-${emblem} emblem-${rarity} ${animated?'emblem-animated':''} ${compact?'compact':''}" role="img" aria-label="${progressionEscape(reward.name || 'Abzeichen')}"><svg viewBox="0 0 100 100" aria-hidden="true"><g class="em-orbit"><circle cx="50" cy="50" r="46"/><circle class="em-satellite" cx="50" cy="4" r="2"/><circle class="em-satellite" cx="50" cy="96" r="2"/></g><g class="em-symbol">${symbols[emblem]}</g></svg></div>`;
+  return `<div class="progression-art pass-emblem emblem-${emblem} emblem-${rarity} ${animated?'emblem-animated':''} ${compact?'compact':''}" role="img" aria-label="${progressionEscape(reward.name || 'Abzeichen')}"><svg viewBox="0 0 100 100" aria-hidden="true"><g class="em-orbit"><path d="M18 4h64v6h8v8h6v64h-6v8h-8v6H18v-6h-8v-8H4V18h6v-8h8z"/><rect class="em-satellite" x="48" y="2" width="4" height="4"/><rect class="em-satellite" x="48" y="94" width="4" height="4"/></g><g class="em-symbol">${symbols[emblem]}</g></svg></div>`;
 }
 
 function progressionRewardArt(reward = {}, compact = false) {
+  if (typeof passExtraArt === 'function') {
+    const extra = passExtraArt(reward, compact);
+    if (extra) return extra;
+  }
   if (reward.kind === 'portrait') {
     const character = reward.character || 'snake';
     if (progressionSecretLocked(character)) return progressionSecretArt(compact);
-    const src = progressionCharacterImage(character, reward.variant === 'lord');
     const frame = reward.frame || reward.variant || 'base';
     const breakout = progressionCharacterBreakout(character, frame);
-    return `<div class="progression-art ${compact ? 'compact' : ''} ${reward.variant === 'lord' ? 'lord-art' : ''} frame-${progressionEscape(frame)} ${breakout ? `character-breakout breakout-${progressionEscape(character)}` : ''}">${breakout || (src ? `<img src="${src}" alt="" loading="lazy">` : '')}${progressionFrameEffect(frame)}</div>`;
+    return `<div class="progression-art ${compact ? 'compact' : ''} ${reward.variant === 'lord' ? 'lord-art' : ''} frame-${progressionEscape(frame)} ${breakout ? `character-breakout breakout-${progressionEscape(character)}` : ''}">${breakout || progressionPixelSprite(character, reward.variant === 'lord')}${progressionFrameEffect(frame)}</div>`;
   }
   if (reward.kind === 'badge') return progressionBadgeArt(reward, compact);
   return `<div class="progression-art pass-title-art ${compact ? 'compact' : ''}"><span class="title-insignia" aria-hidden="true">${reward.rarity === 'mythic' ? '♛' : '✦'}</span>${progressionTitleMarkup(reward)}</div>`;
 }
 function progressionCharacterBreakout(character, frame) {
   if (!['eternal', 'astral'].includes(frame) || progressionSecretLocked(character) || !progressionCharactersCatalog().some(c => c.id === character)) return '';
-  return `<span class="portrait-scene-background" aria-hidden="true"><svg viewBox="0 0 100 140" preserveAspectRatio="none"><circle cx="50" cy="59" r="34"/><circle cx="50" cy="59" r="29"/><path d="M50 20v78M12 59h76M23 32l54 54M23 86l54-54"/><path class="scene-stars" d="m16 23 2-4 2 4-2 4Zm65 81 2-4 2 4-2 4ZM27 111l2-4 2 4-2 4Z"/></svg></span><img class="portrait-creature" src="/characters/${progressionEscape(character)}-lord-breakout.png" alt="" loading="lazy">`;
+  return `<span class="portrait-scene-background" aria-hidden="true"><svg viewBox="0 0 100 140" preserveAspectRatio="none"><path d="M20 24h60v72H20zM28 32h44v56H28zM50 16v88M12 60h76"/><path class="scene-stars" d="M14 20h6v6h-6zM80 100h6v6h-6zM24 112h6v6h-6z"/></svg></span>${progressionPixelSprite(character,true,'portrait-creature')}`;
 }
 function progressionFrameEffect(frame) {
   if (!['eternal', 'astral'].includes(frame)) return '';
@@ -176,11 +333,10 @@ function progressionBadgeArt(reward = {}, compact = false) {
   return `<div class="progression-art sigil badge-art badge-shape-${shape} ${compact ? 'compact' : ''}" aria-hidden="true"><svg viewBox="0 0 24 24">${paths[shape]}</svg><i>${String(shape + 1)}</i></div>`;
 }
 function progressionMasteryBadgeArt(tier, compact = false) {
-  const art = {
-    lord: '<path class="mb-shield" d="M32 5 55 13v21c0 16-13 27-23 34C22 61 9 50 9 34V13z"/><path class="mb-crystal" d="m32 17 5 10 11 2-8 8 2 11-10-5-10 5 2-11-8-8 11-2z"/>',
-    silver: '<path class="mb-wings" d="M27 23 5 9l9 25-8 8 24 12zm10 0L59 9l-9 25 8 8-24 12z"/><path class="mb-shield" d="M32 7 50 16v20c0 11-10 20-18 26-8-6-18-15-18-26V16z"/><path class="mb-crystal" d="m32 18 5 9 10 2-7 7 2 10-10-5-10 5 2-10-7-7 10-2z"/><path class="mb-engrave" d="M20 52h24M22 57h20"/>',
-    gold: '<path class="mb-wings" d="M25 26 1 8l11 31-9 8 26 11zm14 0L63 8 52 39l9 8-26 11z"/><path class="mb-crown" d="m14 13 7 10 11-12 11 12 7-10 5 17H9z"/><path class="mb-shield" d="M32 18 49 25v15c0 11-10 19-17 24-7-5-17-13-17-24V25z"/><path class="mb-inner" d="M32 24 44 29v11c0 7-7 12-12 16-5-4-12-9-12-16V29z"/><path class="mb-crystal" d="m32 29 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/><circle class="mb-gem" cx="9" cy="30" r="2"/><circle class="mb-gem" cx="55" cy="30" r="2"/>',
-  }[tier] || '<path class="mb-shield" d="M32 5 55 13v21c0 16-13 27-23 34C22 61 9 50 9 34V13z"/>';
+  const art = '<path class="mb-shield" d="M16 8h32v6h8v26h-6v12h-6v10h-8v6h-8v-6h-8V52h-6V40H8V14h8z"/>'+
+    (tier!=='lord'?'<path class="mb-wings" d="M8 20H0v10h4v12h6v10h8V40h-6V30H8zM56 20h8v10h-4v12h-6v10h-8V40h6V30h4z"/>':'')+
+    (tier==='gold'?'<path class="mb-crown" d="M14 14V4h6v6h8V0h8v10h8V4h6v10h-6v6H20v-6z"/>':'')+
+    '<path class="mb-crystal" d="M28 25h8v8h8v8h-8v8h-8v-8h-8v-8h8z"/>';
   const label = tier === 'gold' ? 'Gold-Lord' : tier === 'silver' ? 'Silber-Lord' : 'Lord';
   return `<div class="mastery-badge-art mastery-badge-${progressionEscape(tier)} ${compact ? 'compact' : ''}" role="img" aria-label="${label}-Siegel"><svg viewBox="0 0 64 76" aria-hidden="true">${art}</svg></div>`;
 }
@@ -223,7 +379,7 @@ function progressionEquipped(reward) {
 }
 function progressionEquipButton(reward) {
   const owned = progressionRewardOwned(reward) || reward.unlocked === true;
-  if (!owned || !['portrait', 'badge', 'title'].includes(reward.kind)) return '';
+  if (!owned || !['portrait', 'badge', 'title', 'scene', 'aura', 'trail', 'banner', 'finisher'].includes(reward.kind)) return '';
   const selected = progressionEquipped(reward) && !(reward.kind === 'portrait' && progressionGame().companionChosen === false);
   const companion = progressionGame().companion;
   const switchLocked = reward.kind === 'portrait' && companion?.activeId && reward.character !== companion.activeId && !companion.canSwitch;
@@ -235,7 +391,7 @@ function progressionRewardCard(reward, options = {}) {
   }
   const owned = progressionRewardOwned(reward) || reward.unlocked === true;
   const locked = options.locked || !owned;
-  return `<article class="progression-reward rarity-border-${progressionRarity[reward.rarity]?.[1] || 'common'} ${locked ? 'is-locked' : ''}">${progressionRewardArt(reward)}<div class="progression-reward-copy">${progressionRarityMarkup(reward)}<h3>${progressionEscape(progressionRewardName(reward))}</h3><p>${progressionEscape(reward.description || (locked ? options.unlockText || 'Noch nicht freigeschaltet' : 'In deiner Sammlung'))}</p>${reward.kind === 'title' ? `<span class="title-preview">${progressionTitleMarkup(reward)}</span>` : ''}</div>${locked ? '<span class="progression-lock" aria-label="Gesperrt">▣</span>' + progressionUnlock(reward) : progressionEquipButton(reward)}</article>`;
+  return `<article class="progression-reward rarity-border-${progressionRarity[reward.rarity]?.[1] || 'common'} ${locked ? 'is-locked' : ''}">${progressionRewardArt(reward)}<div class="progression-reward-copy">${progressionRarityMarkup(reward)}<h3>${progressionEscape(progressionRewardName(reward))}</h3><p>${progressionEscape(reward.description || (locked ? options.unlockText || 'Noch nicht freigeschaltet' : 'In deiner Sammlung'))}</p>${reward.kind === 'title' ? `<span class="title-preview">${progressionTitleMarkup(reward)}</span>` : ''}</div>${locked ? '<span class="progression-lock" aria-label="Gesperrt">▣</span>' + progressionUnlock(reward) : progressionEquipButton(reward)}${typeof passExtraPreviewButton === 'function' ? passExtraPreviewButton(reward) : ''}</article>`;
 }
 function progressionCountdown(endAt) {
   const end = Date.parse(endAt || '');
@@ -277,13 +433,18 @@ function progressionFilteredPermanent(all = progressionChallenges().permanent ||
 function progressionPermanentResults(filtered, all, visible = filtered.slice(0, (progressionPage + 1) * 12)) {
   return `<div class="progression-permanent-grid">${visible.length ? visible.map(m => progressionMissionCard(m, m.domain || 'Dauerhaft')).join('') : `<div class="progression-empty"><strong>${all.length ? 'Keine Missionen für diese Suche.' : 'Deine Langzeitziele erscheinen hier.'}</strong><p>${all.length ? 'Passe Suchbegriff oder Statusfilter an.' : 'Arbeite an echten Einsätzen, um deine Sammlung aufzubauen.'}</p></div>`}</div>${visible.length < filtered.length ? `<button class="progression-load-more" data-progression-more>Weitere Missionen laden <span>${visible.length} / ${filtered.length}</span></button>` : ''}`;
 }
+function progressionPassBonus(tier) {
+  const bonuses = (tier.rewards || []).slice(1);
+  if (!bonuses.length) return '';
+  return `<section class="pass-bonus-rewards"><small>+ ZUSÄTZLICHE BELOHNUNG</small>${bonuses.map(reward => `<div class="pass-bonus-item">${progressionRewardArt(reward, true)}<div><h5>${progressionEscape(reward.name)}</h5><p>${progressionEscape(reward.presentation || reward.description || '')}</p></div></div><div class="pass-bonus-actions">${reward.kind === 'currency' ? tier.unlocked ? '<span class="fine-print">✓ Automatisch im Arkanstaubkonto</span><button class="progression-equip" data-view="casino">Zum Spinwheel →</button>' : '' : tier.unlocked ? progressionEquipButton(reward) : ''}${typeof passExtraPreviewButton === 'function' ? passExtraPreviewButton(reward) : ''}</div>`).join('')}</section>`;
+}
 function progressionPass() {
   const pass = progressionGame().battlepass || {}, tiers = pass.tiers || [];
   const level = Number(pass.level) || 0, xp = Number(pass.xp) || 0;
   const currentPage = Math.min(Math.max(0, Math.ceil(tiers.length / 4) - 1), Math.floor(level / 4));
   const page = Math.max(0, Math.min(Math.ceil(tiers.length / 4) - 1, progressionPassPage ?? currentPage));
   const visible = tiers.slice(page * 4, (page + 1) * 4);
-  return `<section class="progression-panel pass-paged"><header class="progression-pass-hero"><div><span class="progression-overline">DEINE EINSÄTZE. DEINE BELOHNUNGEN.</span><h2>Battlepass</h2><p>Spiele Einsätze und erfülle Missionen für Pass-EP. Jede erreichte Stufe schaltet ihre Belohnung automatisch im Profil frei.</p><div class="progression-pass-level"><span>STUFE <strong>${level}</strong> / ${tiers.length}</span><span>${xp.toLocaleString('de-AT')} PASS-EP</span></div><progress max="100" value="${Number(pass.progress) || 0}" aria-label="Battlepassfortschritt"></progress></div><div class="pass-seal" aria-hidden="true"><span>STUFE</span><strong>${level}</strong></div></header><div class="progression-tier-heading"><button class="text-button" data-view="missions">Pass-EP verdienen →</button><div><span class="progression-overline">SEITE ${page + 1} VON ${Math.max(1, Math.ceil(tiers.length / 4))}</span><h3>Stufen ${page * 4 + 1}–${Math.min(tiers.length, (page + 1) * 4)}</h3></div></div>${progressionPassNavigation(tiers, page, currentPage)}<div class="progression-tier-grid">${visible.map(t => `<article class="progression-tier pass-reward-${progressionRarity[t.reward?.rarity]?.[1] || 'common'} ${t.unlocked ? 'earned' : ''} ${Number(t.level) === level + 1 ? 'next-tier' : ''}"><span class="tier-number">STUFE ${t.level}</span>${progressionRewardArt(t.reward || {})}<h4>${progressionEscape(progressionRewardName(t.reward || {}))}</h4><div>${progressionRarityMarkup(t.reward || {})}</div><p class="reward-presentation">${progressionEscape(t.reward?.presentation || 'Profilbelohnung')}</p><p class="tier-unlock">${t.unlocked ? '✓ Freigeschaltet' : `Ab ${Number(t.requiredXp || 0).toLocaleString('de-AT')} Pass-EP`}</p>${t.unlocked ? progressionEquipButton(t.reward || {}) : ''}</article>`).join('')}</div>${progressionPassNavigation(tiers, page, currentPage)}</section>`;
+  return `<section class="progression-panel pass-paged"><header class="progression-pass-hero"><div><span class="progression-overline">DEINE EINSÄTZE. DEINE BELOHNUNGEN.</span><h2>Battlepass</h2><span class="pass-reward-count">${pass.rewardCount || tiers.length} BELOHNUNGEN · ${tiers.length} STUFEN</span><p>Spiele Einsätze und erfülle Missionen für Pass-EP. Jede erreichte Stufe schaltet zwei Belohnungen frei. Looks & Effekte findest du im Profil, Arkanstaub landet automatisch im Konto.</p><div class="progression-pass-level"><span>STUFE <strong>${level}</strong> / ${tiers.length}</span><span>${xp.toLocaleString('de-AT')} PASS-EP</span></div><progress max="100" value="${Number(pass.progress) || 0}" aria-label="Battlepassfortschritt"></progress></div><div class="pass-seal" aria-hidden="true"><span>STUFE</span><strong>${level}</strong></div></header><div class="progression-tier-heading"><div class="pass-destinations"><button class="text-button" data-view="missions">Pass-EP verdienen →</button><button class="text-button" data-pass-collection>Meine Looks & Effekte →</button></div><div><span class="progression-overline">SEITE ${page + 1} VON ${Math.max(1, Math.ceil(tiers.length / 4))}</span><h3>Stufen ${page * 4 + 1}–${Math.min(tiers.length, (page + 1) * 4)}</h3></div></div>${progressionPassNavigation(tiers, page, currentPage)}<div class="progression-tier-grid">${visible.map(t => `<article class="progression-tier pass-reward-${progressionRarity[t.reward?.rarity]?.[1] || 'common'} ${t.unlocked ? 'earned' : ''} ${Number(t.level) === level + 1 ? 'next-tier' : ''}"><span class="tier-number">STUFE ${t.level}</span><div class="pass-reward-preview">${progressionRewardArt(t.reward || {})}</div><h4>${progressionEscape(progressionRewardName(t.reward || {}))}</h4><div>${progressionRarityMarkup(t.reward || {})}</div><p class="reward-presentation">${progressionEscape(t.reward?.presentation || 'Profilbelohnung')}</p><p class="tier-unlock">${t.unlocked ? '✓ Freigeschaltet' : `Ab ${Number(t.requiredXp || 0).toLocaleString('de-AT')} Pass-EP`}</p>${t.unlocked ? progressionEquipButton(t.reward || {}) : ''}${progressionPassBonus(t)}</article>`).join('')}</div>${progressionPassNavigation(tiers, page, currentPage)}</section>`;
 }
 function progressionMastery() {
   const accountMasteries = progressionGame().masteries || [];
@@ -302,8 +463,8 @@ function progressionEternalMastery(mastery) {
     ['lord', 'Lord', 'DEINE ERSTE FORM', { solved: 50, hardSolved: 10 }, 'Das Lord-Portrait deines Begleiters.'],
     ['silver', 'Silber-Lord', 'NACH LORD · SILBERRAHMEN', { solved: 100, hardSolved: 25 }, 'Dein Lord-Portrait mit silbernem Rahmen.'],
     ['gold', 'Ultimativer Gold-Lord', 'NACH SILBER · GOLDRAHMEN', { solved: 200, hardSolved: 60 }, 'Dein Lord-Portrait mit leuchtendem Goldrahmen.'],
-    ['eternal', 'Ewiger Lord', 'NACH GOLD · ANIMIERTER RAHMEN', { solved: 1000, hardSolved: 400 }, 'Dein Lord-Portrait erhält lebendige Energiebahnen, Kristalle und Sternenfunken.'],
-    ['astral', 'Astral-Lord', 'NACH EWIG · BEWEGTES PORTRAIT', { solved: 2500, hardSolved: 1000 }, 'Dein Lord-Portrait schwebt in einer kosmischen Aura. Lichtschweife, leuchtende Bahnen und ein wandernder Lichtreflex beleben das ganze Bild.'],
+    ['eternal', 'Ewiger Lord', 'NACH GOLD · ANIMIERTER RAHMEN', { solved: 1000, hardSolved: 400 }, 'Dein Lord-Porträt bleibt still. Ein heller türkisfarbener Rahmen pulsiert außen um das Tier.'],
+    ['astral', 'Astral-Lord', 'NACH EWIG · BEWEGTES PORTRAIT', { solved: 2500, hardSolved: 1000 }, 'Dein Lord-Porträt schwebt vor einem festen Hintergrund. Ein gold-violetter Rahmen und leuchtende Funken umgeben das Tier.'],
   ].map(([frame, name, label, fallback, description]) => {
     const required = (frame === 'lord' ? mastery.lordRequirements : mastery.prestigeRequirements?.[frame]) || fallback;
     const reward = { id: `portrait-${character}-lord${frame === 'lord' ? '' : '-' + frame}`, name, kind: 'portrait',
@@ -348,25 +509,26 @@ function progressionCollection() {
       })),
     ];
   });
-  const known = [...inventory, ...passRewards, ...speciesPreviews, ...formRewards, ...lordRewards].filter((r, i, a) => r.id && a.findIndex(x => x.id === r.id) === i)
+  const known = [...inventory, ...(game.arcane?.segments || []).map(s => s.reward).filter(Boolean), ...passRewards, ...speciesPreviews, ...formRewards, ...lordRewards].filter((r, i, a) => r.id && a.findIndex(x => x.id === r.id) === i)
     .map(r => ({ ...r, unlocked: progressionRewardOwned(r) }));
   const filtered = known.filter(r => progressionCollectionKind === r.kind &&
     (r.kind !== 'portrait' || progressionCollectionSpecies === 'all' || r.character === progressionCollectionSpecies) &&
     (progressionCollectionStatus === 'all' || (progressionCollectionStatus === 'owned') === r.unlocked));
   const visible = filtered.slice(0, (progressionCollectionPage + 1) * 12);
   const label = { title: 'Titel', badge: 'Abzeichen', portrait: 'Formen & Rahmen' }[progressionCollectionKind];
-  return `<section class="progression-panel progression-collection ${progressionCollectionKind === 'portrait' ? 'portrait-gallery' : ''}"><header class="progression-panel-head"><div><span class="progression-overline">DEIN PROFIL ANPASSEN</span><h2>${label}</h2><p>Battlepass: Begleiter, Titel und Abzeichen. Rahmen erhältst du über Meisterungen; bereits vorhandene Rahmen bleiben in deiner Sammlung.</p></div></header><div class="progression-toolbar"><label>Anzeigen<select id="profile-reward-status"><option value="owned" ${progressionCollectionStatus === 'owned' ? 'selected' : ''}>Freigeschaltet</option><option value="locked" ${progressionCollectionStatus === 'locked' ? 'selected' : ''}>Noch gesperrt</option><option value="all" ${progressionCollectionStatus === 'all' ? 'selected' : ''}>Alle</option></select></label>${progressionCollectionKind === 'portrait' ? `<label>Begleiter<select id="progression-species-filter"><option value="all" ${progressionCollectionSpecies === 'all' ? 'selected' : ''}>Alle Begleiter</option>${progressionCharactersCatalog().map(c => `<option value="${progressionEscape(c.id)}" ${progressionCollectionSpecies === c.id ? 'selected' : ''}>${progressionEscape(c.name)}</option>`).join('')}</select></label>` : ''}<span class="progression-result-count">${filtered.length} ${label}</span></div><div class="progression-reward-grid">${visible.length ? visible.map(r => progressionRewardCard(r, { locked: !r.unlocked })).join('') : '<div class="progression-empty"><strong>Hier sind noch keine Belohnungen vorhanden.</strong><p>Unter „Noch gesperrt“ findest du die Voraussetzungen zum Freischalten.</p></div>'}</div>${visible.length < filtered.length ? `<button class="progression-load-more" data-progression-collection-more>Weitere anzeigen <span>${visible.length} / ${filtered.length}</span></button>` : ''}</section>`;
+  return `<section class="progression-panel progression-collection ${progressionCollectionKind === 'portrait' ? 'portrait-gallery' : ''}"><header class="progression-panel-head"><div><span class="progression-overline">DEIN PROFIL ANPASSEN</span><h2>${label}</h2><p>Battlepass: Begleiter, Titel, Abzeichen und neue Looks & Effekte. Rahmen erhältst du über Meisterungen; bereits vorhandene Rahmen bleiben in deiner Sammlung.</p></div></header><div class="progression-toolbar"><label>Anzeigen<select id="profile-reward-status"><option value="owned" ${progressionCollectionStatus === 'owned' ? 'selected' : ''}>Freigeschaltet</option><option value="locked" ${progressionCollectionStatus === 'locked' ? 'selected' : ''}>Noch gesperrt</option><option value="all" ${progressionCollectionStatus === 'all' ? 'selected' : ''}>Alle</option></select></label>${progressionCollectionKind === 'portrait' ? `<label>Begleiter<select id="progression-species-filter"><option value="all" ${progressionCollectionSpecies === 'all' ? 'selected' : ''}>Alle Begleiter</option>${progressionCharactersCatalog().map(c => `<option value="${progressionEscape(c.id)}" ${progressionCollectionSpecies === c.id ? 'selected' : ''}>${progressionEscape(c.name)}</option>`).join('')}</select></label>` : ''}<span class="progression-result-count">${filtered.length} ${label}</span></div><div class="progression-reward-grid">${visible.length ? visible.map(r => progressionRewardCard(r, { locked: !r.unlocked })).join('') : '<div class="progression-empty"><strong>Hier sind noch keine Belohnungen vorhanden.</strong><p>Unter „Noch gesperrt“ findest du die Voraussetzungen zum Freischalten.</p></div>'}</div>${visible.length < filtered.length ? `<button class="progression-load-more" data-progression-collection-more>Weitere anzeigen <span>${visible.length} / ${filtered.length}</span></button>` : ''}</section>`;
 }
 function profileQuickButton() {
   return `<button class="profile-quick" data-view="profile" ${currentView === 'profile' ? 'aria-current="page"' : ''} aria-label="Dein Profil öffnen">${equippedCharacter()}<span><b>Dein Profil</b><small>${equippedTitleMarkup() || 'Begleiter & Ausrüstung'}</small></span>${equippedBadge()}</button>`;
 }
 function progressionUnlock(reward) {
+  if (String(reward.id || '').includes('-arcane-')) return '<div class="reward-unlock"><small>Im Arcane Spinwheel zu finden.</small><button class="progression-equip" data-view="casino">Zum Arcane Casino →</button></div>';
   const game = progressionGame();
   if (reward.kind === 'portrait' && progressionSecretLocked(reward.character)) {
     return '<div class="reward-unlock secret-unlock"><small>Freischaltung unbekannt.</small><span>Manche Legenden hinterlassen keine Anleitung.</span></div>';
   }
   const baseMissing = reward.kind === 'portrait' && !progressionInventory().some(r => r.id === `portrait-${reward.character}-base`);
-  const tier = (game.battlepass?.tiers || []).find(t => t.reward?.id === (baseMissing ? `portrait-${reward.character}-base` : reward.id));
+  const tier = (game.battlepass?.tiers || []).find(t => (t.rewards || [t.reward]).some(r => r?.id === (baseMissing ? `portrait-${reward.character}-base` : reward.id)));
   if (tier) return `<div class="reward-unlock"><small>Battlepass · Stufe ${tier.level} · noch ${Math.max(0, Number(tier.requiredXp || 0) - Number(game.battlepass?.xp || 0)).toLocaleString('de-AT')} Pass-EP</small><button class="progression-equip" data-unlock-pass="${tier.level}">Im Battlepass ansehen →</button></div>`;
   if (reward.companionForm) return `<div class="reward-unlock"><small>Begleiter-Meisterung · alle Fachgebiete</small><button class="progression-equip" data-unlock-mastery="forms" data-unlock-character="${progressionEscape(reward.character)}">Voraussetzungen ansehen →</button></div>`;
   if (reward.masteryId) {
@@ -439,7 +601,7 @@ function companionChoices(first = false) {
     const info = companion.characters?.find(item => item.id === c.id);
     const lockedSwitch = !first && !companion.canSwitch && chosenId !== c.id;
     if (c.secret && !owned) return `<article class="companion-choice locked secret-choice"><div class="companion-choice-art">${progressionSecretArt()}<span>GEHEIM</span></div><div class="companion-choice-copy"><span class="secret-label">UNBEKANNTE IDENTITÄT</span><h3>???</h3><p>Ein Wesen jenseits der bekannten Begleiter. Nur außergewöhnliche Taten können sein Siegel brechen.</p>${progressionUnlock(reward)}</div></article>`;
-    return `<article class="companion-choice ${selected ? 'selected' : ''} ${!owned ? 'locked' : ''}"><div class="companion-choice-art"><img src="${c.baseImage}" alt="${progressionEscape(c.name)}" loading="lazy"><span>${selected ? 'AKTIV' : owned ? 'FREIGESCHALTET' : 'GESPERRT'}</span></div><div class="companion-choice-copy"><h3>${progressionEscape(c.name)}</h3><p>${progressionEscape(info?.affinities?.join(' · ') || 'Begleitet deine Einsätze')}</p>${companionAbilityPreview(info || c)}${companionPassivePreview(info || c)}${owned ? `<strong>Stufe ${info?.level || 1} <small>· ${info?.xp || 0} EP</small></strong><progress max="100" value="${info?.progress || 0}" aria-label="${progressionEscape(c.name)}: Fortschritt"></progress><button class="button ${selected ? '' : 'primary'}" data-progression-equip="portrait" data-reward-id="${id}" aria-pressed="${selected}" ${progressionBusy || isBusy() || selected || lockedSwitch ? 'disabled' : ''}>${selected ? 'Aktiver Begleiter' : lockedSwitch ? (companion.current?.switchUnlocked ? 'Einsatz zuerst beenden' : `Wechsel ab Stufe ${companion.switchLevel || 20}`) : first ? `${progressionEscape(c.name)} wählen` : 'Begleiter wechseln'}</button>` : progressionUnlock(reward)}</div></article>`;
+    return `<article class="companion-choice ${selected ? 'selected' : ''} ${!owned ? 'locked' : ''}"><div class="companion-choice-art">${progressionPixelSprite(c.id)}<span>${selected ? 'AKTIV' : owned ? 'FREIGESCHALTET' : 'GESPERRT'}</span></div><div class="companion-choice-copy"><h3>${progressionEscape(c.name)}</h3><p>${progressionEscape(info?.affinities?.join(' · ') || 'Begleitet deine Einsätze')}</p>${companionAbilityPreview(info || c)}${companionPassivePreview(info || c)}${owned ? `<strong>Stufe ${info?.level || 1} <small>· ${info?.xp || 0} EP</small></strong><progress max="100" value="${info?.progress || 0}" aria-label="${progressionEscape(c.name)}: Fortschritt"></progress><button class="button ${selected ? '' : 'primary'}" data-progression-equip="portrait" data-reward-id="${id}" aria-pressed="${selected}" ${progressionBusy || isBusy() || selected || lockedSwitch ? 'disabled' : ''}>${selected ? 'Aktiver Begleiter' : lockedSwitch ? (companion.current?.switchUnlocked ? 'Einsatz zuerst beenden' : `Wechsel ab Stufe ${companion.switchLevel || 20}`) : first ? `${progressionEscape(c.name)} wählen` : 'Begleiter wechseln'}</button>` : progressionUnlock(reward)}</div></article>`;
   }).join('')}</div>`;
 }
 function companionProfile() {
@@ -447,7 +609,7 @@ function companionProfile() {
   const current = companion.current;
   if (first) return `<section class="companion-profile"><header class="profile-heading"><span class="progression-overline">DEIN ERSTER SCHRITT</span><h1>Wähle deinen Begleiter.</h1><p>Schlange, Wolf oder Drache: Dein Trainingspartner sammelt mit dir Erfahrung. Auf Stufe 20 kannst du den nächsten Begleiter wählen. Dein Tier levelt danach unbegrenzt weiter.</p></header>${companionChoices(true)}</section>`;
   const selectedBadge = progressionInventory().find(r => r.kind === 'badge' && progressionEquipped(r));
-  return `<section class="companion-profile"><header class="profile-heading"><div><span class="progression-overline">DEIN STIL · DEINE ERFOLGE</span><h1>Dein Profil</h1><p>Begleiter, Titel und Abzeichen. Alles an einem Ort.</p></div><a class="text-button" href="#career">Karrierestatistik →</a></header><div class="profile-showcase"><div class="profile-portrait">${equippedCharacter('hero')}</div><div class="profile-details"><span class="progression-overline">DEIN AKTIVER BEGLEITER</span><h2>${progressionEscape(progressionEquippedCharacterName())}</h2><div class="profile-equipped"><span><small>TITEL</small>${equippedTitleMarkup() || 'Kein Titel'}</span><span>${equippedBadge()}<span><small>ABZEICHEN</small>${progressionEscape(selectedBadge?.name || 'Kein Abzeichen')}</span></span></div><p class="companion-affinities">+50 % Begleiter-EP: ${progressionEscape(current?.affinities?.join(' · ') || 'Passende Fachgebiete')}</p><div class="profile-level"><strong>Stufe ${current?.level || 1} <small>· ohne Limit</small></strong><span>${current?.remainingXp ?? 600} EP bis zum Aufstieg</span></div><progress max="100" value="${current?.progress || 0}" aria-label="Begleiterfortschritt"></progress><p class="profile-switch-note">${progressionEscape(companion.switchReason || 'Erreiche Stufe 20, um deinen Begleiter zwischen Einsätzen zu wechseln.')}</p></div></div>${companionAbilityPanel()}${companionPassivePanel()}<nav class="profile-tabs" aria-label="Profil anpassen">${[['companions','Begleiter'],['title','Titel'],['badge','Abzeichen'],['portrait','Formen & Rahmen']].map(([id,label]) => `<button data-profile-tab="${id}" ${profileTab === id ? 'aria-current="page"' : ''}>${label}</button>`).join('')}</nav><div id="profile-content">${profileTab === 'companions' ? companionChoices() : progressionCollection()}</div></section>`;
+  return `<section class="companion-profile"><header class="profile-heading"><div><span class="progression-overline">DEIN STIL · DEINE ERFOLGE</span><h1>Dein Profil</h1><p>Begleiter, Ausrüstung, Looks und Effekte. Alles an einem Ort.</p></div><a class="text-button" href="#career">Karrierestatistik →</a></header>${typeof passExtraBanner === 'function' ? passExtraBanner() : ''}<div class="profile-showcase"><div class="profile-portrait">${equippedCharacter('hero')}</div><div class="profile-details"><span class="progression-overline">DEIN AKTIVER BEGLEITER</span><h2>${progressionEscape(progressionEquippedCharacterName())}</h2><div class="profile-equipped"><span><small>TITEL</small>${equippedTitleMarkup() || 'Kein Titel'}</span><span>${equippedBadge()}<span><small>ABZEICHEN</small>${progressionEscape(selectedBadge?.name || 'Kein Abzeichen')}</span></span></div><p class="companion-affinities">+50 % Begleiter-EP: ${progressionEscape(current?.affinities?.join(' · ') || 'Passende Fachgebiete')}</p><div class="profile-level"><strong>Stufe ${current?.level || 1} <small>· ohne Limit</small></strong><span>${current?.remainingXp ?? 600} EP bis zum Aufstieg</span></div><progress max="100" value="${current?.progress || 0}" aria-label="Begleiterfortschritt"></progress><p class="profile-switch-note">${progressionEscape(companion.switchReason || 'Erreiche Stufe 20, um deinen Begleiter zwischen Einsätzen zu wechseln.')}</p></div></div>${companionAbilityPanel()}${companionPassivePanel()}<nav class="profile-tabs" aria-label="Profil anpassen">${[['companions','Begleiter'],['title','Titel'],['badge','Abzeichen'],['portrait','Formen & Rahmen'],['extras','Looks & Effekte']].map(([id,label]) => `<button data-profile-tab="${id}" ${profileTab === id ? 'aria-current="page"' : ''}>${label}</button>`).join('')}</nav><div id="profile-content">${profileTab === 'companions' ? companionChoices() : profileTab === 'extras' && typeof passExtrasCollection === 'function' ? passExtrasCollection() : progressionCollection()}</div></section>`;
 }
 function renderCompanionDock() {
   const dock = document.querySelector('#companion-dock');
@@ -468,10 +630,9 @@ function progressionHub() {
 }
 function progressionEquippedCharacter(size = 'small') {
   const selected = progressionInventory().find(r => r.kind === 'portrait' && progressionEquipped(r) && progressionRewardOwned(r));
-  const img = !selected ? '' : progressionCharacterImage(selected.character, selected.variant === 'lord');
   const frame = selected?.frame || selected?.variant || 'base';
   const breakout = progressionCharacterBreakout(selected?.character, frame);
-  return `<span class="progression-avatar avatar-${size} frame-${progressionEscape(frame)} ${selected?.variant === 'lord' ? 'lord-portrait' : ''} ${breakout ? `character-breakout breakout-${progressionEscape(selected.character)}` : ''}">${breakout || (img ? `<img src="${img}" alt="">` : '')}${progressionFrameEffect(frame)}</span>`;
+  return `<span class="progression-avatar avatar-${size} frame-${progressionEscape(frame)} ${selected?.variant === 'lord' ? 'lord-portrait' : ''} ${breakout ? `character-breakout breakout-${progressionEscape(selected.character)}` : ''}">${breakout || (selected ? progressionPixelSprite(selected.character, selected.variant === 'lord') : '')}${progressionFrameEffect(frame)}</span>`;
 }
 function equippedCharacter(size = 'small') { return progressionEquippedCharacter(size); }
 function progressionEquippedCharacterName() {
@@ -486,42 +647,56 @@ function equippedBadge() {
   const badge = progressionInventory().find(r => r.kind === 'badge' && progressionEquipped(r) && progressionRewardOwned(r));
   return badge ? progressionBadgeArt(badge, true) : '';
 }
+function careerRanks() {
+  return progressionGame().ranked?.ranks || levels.flatMap((baseName, tierIndex) =>
+    [1, 2, 3].map(division => ({ name: `${baseName} ${division}`, baseName, division,
+      index: tierIndex * 3 + division - 1, tierIndex, level: tierIndex + 1 })));
+}
+function careerRankTrack() {
+  const rank = progressionGame().ranked || { index: 0 };
+  const ranks = careerRanks();
+  return `<div class="level-track">${levels.map((name, tierIndex) => {
+    const divisions = ranks.filter(item => item.tierIndex === tierIndex);
+    const current = divisions.some(item => item.index === rank.index);
+    return `<div class="level-step ${current ? 'current' : ''}"><span class="level-number">${String(tierIndex + 1).padStart(2, '0')}</span><div class="career-tier-copy">${progressionEscape(name)}<div class="career-divisions">${divisions.map(item => `<span class="career-division ${item.index === rank.index ? 'current' : item.index < rank.index ? 'completed' : ''}" ${item.index === rank.index ? 'aria-current="step"' : ''} aria-label="${progressionEscape(item.name)}${item.index === rank.index ? ', dein aktueller Rang' : ''}">${item.division}</span>`).join('')}</div>${current ? `<small>Dein aktueller Rang: ${progressionEscape(divisions.find(item => item.index === rank.index).name)}</small>` : ''}</div></div>`;
+  }).join('')}</div>`;
+}
 function ranksScreen() {
   const rank = progressionGame().ranked || { index: 0, rr: 0, totalRr: 0 };
-  const ranks = rank.ranks || levels.map((name, index) => ({ name, index, level: index + 1 }));
+  const ranks = careerRanks();
   const step = rank.rules?.rrPerRank || 100;
   const current = ranks[rank.index] || ranks[0];
   const next = ranks[rank.index + 1];
   return `<section class="rank-gallery" aria-labelledby="rank-gallery-title">
     <div class="rank-gallery-top"><button class="text-button" data-view="menu">${icon('back')} Hauptmenü</button><span>CAREER MODE / RANGLISTE</span></div>
-    <header class="rank-gallery-heading"><span class="eyebrow">DEIN WEG NACH OBEN</span><h1 id="rank-gallery-title">DIE EINSATZRÄNGE</h1><p>Sechs Ränge. Verdient durch deine Entscheidungen.<br>Jeder Aufstieg bringt anspruchsvollere Einsätze.</p></header>
-    <ol class="rank-lineup" aria-label="Alle sechs Einsatzränge">${ranks.map(item => {
-      const active = item.index === rank.index;
+    <header class="rank-gallery-heading"><span class="eyebrow">DEIN WEG NACH OBEN</span><h1 id="rank-gallery-title">DIE EINSATZRÄNGE</h1><p>Sechs Ränge. Je drei Stufen. Dein Weg durch 18 Aufstiegsstufen.<br>100 RR pro Stufe · Nach Stufe 3 folgt der nächste Rang.</p></header>
+    <ol class="rank-lineup" aria-label="Sechs Einsatzränge mit je drei Stufen">${levels.map((name, tierIndex) => {
+      const divisions = ranks.filter(item => item.tierIndex === tierIndex);
+      const item = divisions.find(item => item.index === rank.index) || divisions[0];
+      const active = divisions.some(item => item.index === rank.index);
       return `<li class="rank-tier ${active ? 'is-current' : item.index < rank.index ? 'is-lower' : 'is-higher'}" ${active ? 'aria-current="step"' : ''}>
         <span class="rank-tier-number">RANG ${String(item.level).padStart(2, '0')}</span>
         <div class="rank-tier-emblem">${grandRankBadge(item)}</div>
-        <h2>${progressionEscape(item.name)}</h2><span class="rank-tier-threshold">AB ${item.index * step} GESAMT-RR</span>
-        <span class="rank-tier-state">${active ? '◆ DEIN RANG' : item.index < rank.index ? 'UNTER DEINEM RANG' : item.index === rank.index + 1 ? 'NÄCHSTES ZIEL' : 'HÖHERER RANG'}</span>
+        <h2>${progressionEscape(name)}</h2><ol class="rank-divisions" aria-label="Stufen von ${progressionEscape(name)}">${divisions.map(division => `<li class="rank-division ${division.index === rank.index ? 'is-current' : division.index < rank.index ? 'is-lower' : 'is-higher'}" ${division.index === rank.index ? 'aria-current="true"' : ''}><strong aria-label="${progressionEscape(division.name)}">${division.division}</strong><small>AB ${division.index * step} GESAMT-RR</small></li>`).join('')}</ol>
+        <span class="rank-tier-state">${active ? `◆ DEINE STUFE ${item.division}` : item.index < rank.index ? 'UNTER DEINEM RANG' : divisions.some(item => item.index === rank.index + 1) ? 'NÄCHSTES ZIEL' : 'HÖHERER RANG'}</span>
       </li>`;
     }).join('')}</ol>
     <section class="rank-current" aria-label="Dein aktueller Rangfortschritt"><div><span class="eyebrow">DEIN AKTUELLER STAND</span><h2>${progressionEscape(current.name)}</h2><p>${next ? `Noch ${step - rank.rr} RR bis ${progressionEscape(next.name)}.` : 'Du hast den höchsten Einsatzrang erreicht.'}</p></div><div class="rank-current-meter"><div><strong>${rank.rr}<small> / ${step} RR</small></strong><span>${rank.totalRr} GESAMT-RR</span></div><progress max="${step}" value="${rank.rr}" aria-label="${rank.rr} von ${step} Rangpunkten"></progress><small>${next ? step + ' RR → Aufstieg' : rank.rr === step ? 'Maximaler Rangfortschritt erreicht' : 'Noch ' + (step - rank.rr) + ' RR bis zum Maximum'}</small></div></section>
-    <details class="rank-gallery-info"><summary>So funktioniert der Aufstieg ${icon('arrow')}</summary><div class="rank-gallery-rules"><p><strong>Verdiene deinen Aufstieg.</strong> Karrierefälle auf deiner Rangstufe oder darüber zählen. Qualität, Sicherheit und Effizienz bestimmen deine Rangpunkte.</p><p><strong>Jeder Rang fordert mehr.</strong> RR-Gewinne werden kleiner, Abzüge größer. Speedruns verändern deinen Einsatzrang nicht.</p></div></details>
+    <details class="rank-gallery-info"><summary>So funktioniert der Aufstieg ${icon('arrow')}</summary><div class="rank-gallery-rules"><p><strong>Immer drei Stufen pro Rang.</strong> IT-Support 1 → 2 → 3 → Fortgeschrittener IT-Support 1. Je 100 RR steigst du eine Stufe auf; unter die Grenze fällst du zurück. Erst der nächste Hauptrang erhöht die Ticketstufe. Qualität, Sicherheit und Effizienz bestimmen deine Rangpunkte.</p><p><strong>Einfacher einsteigen, später mehr leisten.</strong> Auf Rang 1–3 gibt es ab 70 Punkten einen Einstiegsbonus und kleinere Abzüge. Ab Rang 4 bleiben Gewinne und Abzüge anspruchsvoll. Bestehende Spielstände behalten ihren Hauptrang und ihre RR innerhalb der ersten Stufe. Speedruns verändern deinen Einsatzrang nicht.</p></div></details>
   </section>`;
 }
 
 function grandRankBadge(rank) {
-  const index = Math.max(0, Math.min(5, Number(rank?.index) || 0));
-  const colors = ['#8793a2', '#63d1b7', '#6fbdff', '#c696ff', '#ffb35d', '#ffe17b'];
-  const stars = Array.from({ length: index + 1 }, () => '<i aria-hidden="true">✦</i>').join('');
-  const crest = [
-    '<path class="rank-core" d="M55 16 81 27v27c0 16-15 29-26 37-11-8-26-21-26-37V27z"/>',
-    '<path class="rank-core" d="M55 13 83 27v28c0 17-16 30-28 39-12-9-28-22-28-39V27z"/><path class="rank-wing" d="M27 38 8 28l8 23-11 9 23 10zm56 0 19-10-8 23 11 9-23 10z"/>',
-    '<path class="rank-core" d="M55 10 83 22l-4 37-24 34-24-34-4-37z"/><path class="rank-wing" d="M27 34 5 18l8 32-9 10 28 9zm56 0 22-16-8 32 9 10-28 9z"/>',
-    '<path class="rank-core" d="M55 10 84 22v31L55 92 26 53V22z"/><path class="rank-wing" d="m28 30-22-8 12 23-13 9 27 12zm54 0 22-8-12 23 13 9-27 12z"/><path class="rank-crown" d="m35 20 8-12 12 9 12-9 8 12-5 9H40z"/>',
-    '<path class="rank-orbit" d="M17 53a38 28-24 1 0 76 0 38 28-24 1 0-76 0"/><path class="rank-core" d="M55 7 83 20l4 31-32 43-32-43 4-31z"/><path class="rank-crown" d="m33 19 7-15 15 10L70 4l7 15-7 11H40z"/><circle class="rank-orbit-gem" cx="17" cy="53" r="4"/><circle class="rank-orbit-gem" cx="93" cy="53" r="4"/>',
-    '<path class="rank-orbit" d="M13 55a42 30 0 1 0 84 0 42 30 0 1 0-84 0"/><path class="rank-orbit" d="M55 7a30 42 0 1 0 0 84 30 42 0 1 0 0-84"/><path class="rank-core" d="M55 5 83 19l6 31-34 43-34-43 6-31z"/><path class="rank-crown" d="m29 18 10-16 16 11L71 2l10 16-8 13H37z"/><circle class="rank-orbit-gem" cx="13" cy="55" r="4"/><circle class="rank-orbit-gem" cx="97" cy="55" r="4"/><circle class="rank-orbit-gem" cx="55" cy="7" r="4"/><circle class="rank-orbit-gem" cx="55" cy="103" r="4"/>',
-  ][index];
-  return `<span class="grand-rank grand-rank-${index}" role="img" aria-label="Rang ${progressionEscape(rank?.name || progressionRankNames[index])}, Stufe ${index + 1}"><svg viewBox="0 0 110 110" aria-hidden="true"><path class="rank-rim" d="M55 8 88 22v32c0 21-20 37-33 46C42 91 22 75 22 54V22z"/>${crest}<path class="rank-gem" d="m55 25 6 12 13 2-9 9 2 13-12-6-12 6 2-13-9-9 13-2z"/></svg><span class="rank-stars">${stars}</span><strong>${String(index + 1).padStart(2, '0')}</strong><small>${progressionEscape(rank?.name || progressionRankNames[index])}</small></span>`;
+  const index = Math.max(0, Math.min(5, Number(rank?.tierIndex ?? Math.floor((rank?.index || 0) / 3)) || 0));
+  const division = Math.max(1, Math.min(3, Number(rank?.division) || 1));
+  const name = rank?.name || `${levels[index]} ${division}`;
+  const stars = Array.from({ length: division }, () => '<i aria-hidden="true">✦</i>').join('');
+  const crest = '<path class="rank-core" d="M33 21h44v6h6v30h-6v12h-6v12h-9v8H48v-8h-9V69h-6V57h-6V27h6z"/>'+
+    (index>=1?'<path class="rank-wing" d="M27 33H9v12h6v12h6v12h12V57h-6zM83 33h18v12h-6v12h-6v12H77V57h6z"/>':'')+
+    (index>=3?'<path class="rank-crown" d="M32 21V9h7v6h9V3h14v12h9V9h7v12h-7v6H39v-6z"/>':'')+
+    (index>=4?'<path class="rank-orbit" d="M17 37V25h8V17h12M73 17h12v8h8v12M93 73v12h-8v8H73M37 93H25v-8h-8V73"/><rect class="rank-orbit-gem" x="12" y="51" width="7" height="7"/><rect class="rank-orbit-gem" x="91" y="51" width="7" height="7"/>':'')+
+    (index===5?'<path class="rank-wing" d="M3 8h7v7h7v7h-7v7H3V15zM107 8h-7v7h-7v7h7v7h7V15zM3 81h7v7h7v7h-7v7H3V88zM107 81h-7v7h-7v7h7v7h7V88z"/>':'');
+  return `<span class="grand-rank grand-rank-${index}" role="img" aria-label="Rang ${progressionEscape(name)}, Stufe ${division}"><svg viewBox="0 0 110 110" aria-hidden="true"><path class="rank-rim" d="M27 12h56v7h9v42h-7v14h-8v12h-9v8H42v-8h-9V75h-8V61h-7V19h9z"/>${crest}<path class="rank-gem" d="M49 33h12v12h12v12H61v12H49V57H37V45h12z"/></svg><span class="rank-stars">${stars}</span><strong>${division}</strong><small>${progressionEscape(name)}</small></span>`;
 }
 
 document.addEventListener('click', async event => {
@@ -533,7 +708,7 @@ document.addEventListener('click', async event => {
   const profile = event.target.closest('[data-profile-tab]');
   if (profile) {
     profileTab = profile.dataset.profileTab;
-    if (profileTab !== 'companions') progressionCollectionKind = profileTab;
+    if (!['companions', 'extras'].includes(profileTab)) progressionCollectionKind = profileTab;
     if (profileTab === 'portrait') progressionCollectionSpecies = progressionGame().companion?.activeId || 'all';
     progressionCollectionPage = 0;
     render(); document.querySelector(`[data-profile-tab="${profileTab}"]`)?.focus({preventScroll:true}); return;
@@ -561,7 +736,7 @@ document.addEventListener('click', async event => {
     progressionBusy = true; equip.disabled = true;
     try {
       await mutate('cosmetics', { kind, id });
-      if (progressionCosmetics()[kind] === id) window.GameAudio?.play('success');
+      if (progressionCosmetics()[kind] === id) { window.GameAudio?.play('equip'); window.ArcaneFX?.emit('spell'); }
     } finally { progressionBusy = false; render(); document.querySelector(`[data-reward-id="${id}"]`)?.focus({preventScroll:true}); }
   }
 });

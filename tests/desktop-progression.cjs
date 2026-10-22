@@ -161,16 +161,18 @@ module.exports = async (win, directory, painted) => {
     const hero=document.querySelector('.profile-portrait .frame-eternal');
     if(!hero||!hero.querySelector('.eternal-frame-effect'))throw Error('Ewiger Rahmen fehlt im Profil');
     if(!document.querySelector('#companion-dock .frame-eternal'))throw Error('Ewiger Rahmen fehlt im Begleiterdock');
-    const current=hero.querySelector('.eternal-current');
-    if(getComputedStyle(current).animationName!=='eternal-orbit')throw Error('Ewiger Rahmen ist nicht animiert');
-    const orbit=current.getAnimations().find(animation=>animation.animationName==='eternal-orbit');
-    if(!orbit||orbit.playState!=='running')throw Error('Energiebahn läuft nicht');
+    const effect=hero.querySelector('.eternal-frame-effect');
+    const creature=hero.querySelector('.portrait-creature');
+    if(getComputedStyle(creature).animationName!=='none'||getComputedStyle(creature).transform!=='none')throw Error('Ewiges Tier muss statisch bleiben');
+    if(getComputedStyle(effect,'::after').animationName!=='lord-perimeter-glow')throw Error('Sichtbarer Ewiger Rahmen ist nicht animiert');
+    const glow=effect.getAnimations({subtree:true}).find(animation=>animation.animationName==='lord-perimeter-glow');
+    if(!glow||glow.playState!=='running')throw Error('Rahmenleuchten läuft nicht');
     // Hidden smoke windows do not reliably advance the compositor clock.
     // Sample the real CSS animation at two explicit times instead.
-    orbit.currentTime=0;
-    const a=getComputedStyle(current).strokeDashoffset;
-    orbit.currentTime=1000;
-    if(getComputedStyle(current).strokeDashoffset===a)throw Error('Energiebahn bewegt sich nicht');
+    glow.currentTime=0;
+    const a=getComputedStyle(effect,'::after').opacity;
+    glow.currentTime=1000;
+    if(getComputedStyle(effect,'::after').opacity===a)throw Error('Rahmenleuchten verändert sich nicht');
     if(document.documentElement.scrollWidth>document.documentElement.clientWidth)throw Error('Ewiges Profil läuft über');
   })()`), 'Ewiger Rahmen und Animation');
   await bounded(painted(), 'Ewiger Profil-Frame');
@@ -196,7 +198,7 @@ module.exports = async (win, directory, painted) => {
     await Promise.all([...document.querySelectorAll('img')].map(img=>{img.loading='eager';return img.decode();}));
     const hero=document.querySelector('.profile-portrait .frame-astral');
     if(!hero||!hero.querySelector('.astral-halo')||!hero.querySelector('.astral-light-sweep'))throw Error('Astral-Effekte fehlen');
-    const img=hero.querySelector('img');
+    const img=hero.querySelector('.portrait-creature');
     if(getComputedStyle(img).animationName!=='creature-astral')throw Error('Astral-Portrait bewegt sich nicht');
     const float=img.getAnimations().find(animation=>animation.animationName==='creature-astral');
     if(!float||float.playState!=='running')throw Error('Astral-Portraitanimation läuft nicht');

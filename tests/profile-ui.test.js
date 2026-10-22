@@ -83,7 +83,8 @@ test('mastery portraits, personal form counters and account titles stay separate
   assert.match(markup, /data-mastery-character="wolf"/);
   assert.doesNotMatch(markup, /data-mastery-character="chimera"|\/characters\/chimera/);
   const dns = markup.slice(markup.indexOf('id="mastery-dns"'), markup.indexOf('</article>', markup.indexOf('id="mastery-dns"')));
-  assert.match(dns, /\/characters\/snake.png/);
+  assert.match(dns, /data-character="snake" data-variant="base"/);
+  assert.match(dns, /\/characters\/pixel-atlas-a.png/);
   assert.match(dns, /Schlange · 7 EIGENE FÄLLE/);
   assert.match(dns, /100 Basis-EP \+ 50 Bonus-EP pro gelöstem Fall/);
   assert.match(dns, /50 Fälle insgesamt · 10 auf Stufe 4/);
@@ -170,7 +171,7 @@ test('every animated companion uses an isolated foreground in cards and equipped
       const card=run('progressionRewardArt('+JSON.stringify(reward)+')');
       assert.match(card,new RegExp('character-breakout breakout-'+character));
       assert.match(card,/class="portrait-scene-background"/);
-      assert.ok(card.includes('class="portrait-creature" src="/characters/'+character+'-lord-breakout.png"'));
+      assert.ok(card.includes('class="pixel-sprite portrait-creature" data-character="'+character+'" data-variant="lord"'));
       assert.ok(!card.includes('src="/characters/'+character+'-lord.png"'));
       run('state.game.inventory.push('+JSON.stringify(reward)+');state.game.companionForms['+JSON.stringify(character)+'].'+frame+'Unlocked=true;state.game.cosmetics.portrait='+JSON.stringify(reward.id)+';');
       for(const size of ['small','hero','dock'])assert.match(run("equippedCharacter('"+size+"')"),/portrait-creature/);
@@ -236,7 +237,8 @@ test('discovered secret uses all existing forms and appears in its earned reveal
   for (const frame of ['lord','silver','gold','eternal','astral']) {
     assert.match(collection, new RegExp('data-reward-id="portrait-chimera-lord'+(frame==='lord'?'':'-'+frame)+'"'));
   }
-  assert.match(collection, /\/characters\/chimera-lord.png/);
+  assert.match(collection, /data-character="chimera" data-variant="lord"/);
+  assert.match(collection, /\/characters\/pixel-atlas-secret.png/);
   assert.doesNotMatch(collection, /Battlepassstufe null|Battlepassstufe 0|secret-art/);
   const reveal = run('progressionSecretReveal([state.game.inventory.find(r=>r.id==="portrait-chimera-base")])');
   assert.match(reveal, /DAS SIEGEL IST GEBROCHEN/);

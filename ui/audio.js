@@ -9,7 +9,7 @@
   let settings = { ...defaults }, scene = 'menu', context = null, master = null, musicBus = null, effectsBus = null;
   let unlocked = false, timer = null, nextStep = 0, step = 0, visibilityBound = false, disposed = false;
   let battleAudio = null, battlePlayToken = 0, battlePlayRequest = null, musicError = null;
-  const musicNodes = new Set(), effectNodes = new Set();
+  const musicNodes = new Set(), effectNodes = new Set(), effectGroups = new Map();
   const lastEffectAt = new Map();
   const midi = n => 440 * 2 ** ((n - 69) / 12);
   const harmony = [ // Bright C/F/G/Dm progression across eight bars.
@@ -70,16 +70,18 @@
     });
     battlePlayRequest = pending;
   }
-  function scheduleTone(freq, start, duration, gain, type = 'sine', bus = musicBus, detune = 0) {
-    if (!context || !bus) return;
+  function scheduleTone(freq, start, duration, gain, type = 'sine', bus = musicBus, detune = 0, group = null) {
+    if (!context || !bus) return null;
     const osc = context.createOscillator(), amp = context.createGain();
     osc.type = type; osc.frequency.setValueAtTime(freq, start); if (detune) osc.detune.setValueAtTime(detune, start);
     amp.gain.setValueAtTime(0.0001, start); amp.gain.exponentialRampToValueAtTime(Math.max(0.0002, gain), start + Math.min(0.025, duration * 0.2));
     amp.gain.setTargetAtTime(0.0001, start + duration * 0.55, Math.max(0.025, duration * 0.16));
     const nodes = bus === musicBus ? musicNodes : effectNodes;
     osc.connect(amp); amp.connect(bus); nodes.add(osc); nodes.add(amp);
-    const done = () => { safeDisconnect(osc); safeDisconnect(amp); nodes.delete(osc); nodes.delete(amp); };
+    const done = () => { safeDisconnect(osc); safeDisconnect(amp); nodes.delete(osc); nodes.delete(amp); group?.delete(osc); group?.delete(amp); };
     osc.onended = done; osc.start(start); osc.stop(start + duration + 0.12);
+    group?.add(osc); group?.add(amp);
+    return { osc, amp };
   }
   function scheduleStep() {
     const beat = 60 / 114, eighth = beat / 2, horizon = 0.14;
@@ -117,7 +119,7 @@
       // Keep the synthesized track lively; the scene factor and master retain headroom.
       musicBus.gain.setTargetAtTime(settings.musicTrack === 'funk' && !settings.muted && settings.musicEnabled ? settings.musicVolume * 3.4 : 0, now, 0.025);
       effectsBus.gain.setTargetAtTime(!settings.muted && settings.effectsEnabled ? settings.effectsVolume : 0, now, 0.025);
-      if (settings.muted || !settings.effectsEnabled) cleanupSet(effectNodes);
+      if (settings.muted || !settings.effectsEnabled) cleanupEffects();
       if (!musicOn()) stopMusic(); else if (timer === null) { nextStep = Math.max(nextStep, now + 0.04); scheduleStep(); }
       if (settings.muted || (!settings.musicEnabled && !settings.effectsEnabled) || deps.document?.visibilityState === 'hidden') { try { context.suspend().catch(() => {}); } catch {} }
       else if (unlocked && context.state !== 'running') { try { context.resume().then(sync).catch(() => {}); } catch {} }
@@ -128,7 +130,7 @@
   function onVisibility() {
     if (!unlocked) return;
     if (deps.document.visibilityState === 'hidden') {
-      stopMusic(); pauseBattle();
+      stopMusic(); pauseBattle(); cleanupEffects();
       try { context?.suspend().catch(() => {}); } catch {}
     } else {
       if (context && !settings.muted && (settings.musicEnabled || settings.effectsEnabled)) { try { context.resume().then(sync).catch(() => {}); } catch {} }
@@ -163,19 +165,51 @@
     sync(); return status();
   }
   function setScene(value) { if (!validScenes.has(value) || scene === value) return status(); scene = value; sync(); return status(); }
+  function cleanupEffects() { cleanupSet(effectNodes); effectGroups.clear(); }
+  function stopEffect(name) {
+    const nodes = effectGroups.get(name);
+    if (!nodes) return false;
+    for (const node of nodes) { try { node.stop(); } catch {} safeDisconnect(node); effectNodes.delete(node); }
+    effectGroups.delete(name);
+    return true;
+  }
   function play(name) {
-    if (!context || !unlocked || settings.muted || !settings.effectsEnabled || !['click','arrival','success','error','levelup'].includes(name) || context.state !== 'running') return false;
-    const cooldowns = { click: 40, arrival: 250, success: 180, error: 180, levelup: 400 };
+    const names = ['click','arrival','success','error','levelup','navigate','equip','spell','spin','tick','jackpot'];
+    if (!context || !unlocked || settings.muted || !settings.effectsEnabled || !names.includes(name) || context.state !== 'running' || deps.document?.visibilityState === 'hidden') return false;
+    const cooldowns = { click: 40, arrival: 250, success: 180, error: 180, levelup: 400, navigate: 90, equip: 300, spell: 220, spin: 500, tick: 65, jackpot: 800 };
     const t = context.currentTime, previous = lastEffectAt.get(name);
     if (previous !== undefined && (t - previous) * 1000 < cooldowns[name]) return false;
     lastEffectAt.set(name, t);
-    const specs = { click:[620,0.055,0.045], arrival:[440,0.18,0.095], success:[523.25,0.28,0.12], error:[196,0.22,0.1], levelup:[659.25,0.42,0.14] };
-    const [f, d, g] = specs[name];
-    scheduleTone(f, t, d, g, name === 'error' ? 'triangle' : 'sine', effectsBus);
-    if (name === 'success') scheduleTone(f * 1.25, t + 0.09, d * 0.8, g * 0.55, 'sine', effectsBus);
-    if (name === 'arrival' || name === 'levelup') scheduleTone(f * 1.5, t + 0.1, d * 0.8, g * 0.45, 'triangle', effectsBus);
+    // Each effect is an original, restrained crystal/runic synth motif. The established
+    // five event oscillator counts stay stable for existing callers and tests.
+    const specs = {
+      click:[659.25,0.075,0.035,'sine',7], arrival:[523.25,0.3,0.07,'triangle',-5],
+      success:[587.33,0.32,0.085,'sine',4], error:[174.61,0.27,0.075,'triangle',-9],
+      levelup:[659.25,0.5,0.09,'sine',8], navigate:[783.99,0.12,0.035,'sine',5],
+      equip:[493.88,0.42,0.075,'triangle',-4], spell:[392,0.62,0.07,'sine',12],
+      spin:[146.83,1.05,0.026,'triangle',-8], tick:[1046.5,0.055,0.025,'sine',3],
+      jackpot:[659.25,0.9,0.095,'sine',8]
+    };
+    const [f, d, g, wave, cents] = specs[name];
+    const layered = ['success','arrival','levelup','equip','spell','spin','jackpot'].includes(name);
+    const requiredNodes = layered ? 4 : 2;
+    while (effectNodes.size + requiredNodes > 32) {
+      const oldest = effectGroups.keys().next().value;
+      if (oldest !== undefined) stopEffect(oldest);
+      else cleanupEffects();
+    }
+    // Reuse a live group's set so stopping a name always reaches every overlapping play.
+    const group = effectGroups.get(name) || new Set();
+    effectGroups.set(name, group);
+    scheduleTone(f, t, d, g, wave, effectsBus, cents, group);
+    if (layered) {
+      const ratio = name === 'success' || name === 'jackpot' ? 1.5 : name === 'equip' ? 1.25 : 1.5;
+      const delay = name === 'spin' ? 0 : name === 'spell' ? 0.16 : 0.1;
+      const harmonicGain = name === 'spin' ? 0.35 : name === 'jackpot' ? 0.52 : 0.42;
+      scheduleTone(f * ratio, t + delay, d * 0.78, g * harmonicGain, name === 'arrival' || name === 'equip' ? 'triangle' : 'sine', effectsBus, -cents * 0.5, group);
+    }
     return true;
   }
-  function dispose() { stopMusic(); pauseBattle(); cleanupSet(effectNodes); if (visibilityBound) deps.document.removeEventListener('visibilitychange', onVisibility); visibilityBound = false; if (context) { try { context.close().catch(() => {}); } catch {} } context = master = musicBus = effectsBus = null; battleAudio = null; unlocked = false; disposed = true; return status(); }
-  return { configure, unlock, setScene, play, dispose, status };
+  function dispose() { stopMusic(); pauseBattle(); cleanupEffects(); if (visibilityBound) deps.document.removeEventListener('visibilitychange', onVisibility); visibilityBound = false; if (context) { try { context.close().catch(() => {}); } catch {} } context = master = musicBus = effectsBus = null; battleAudio = null; unlocked = false; disposed = true; return status(); }
+  return { configure, unlock, setScene, play, stopEffect, dispose, status };
 });

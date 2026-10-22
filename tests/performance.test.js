@@ -6,6 +6,7 @@ async function fixture(t,archives=[]){
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'sim-perf-test-'));fs.mkdirSync(path.join(root,'ui/characters'),{recursive:true});fs.mkdirSync(path.join(root,'.sim'));
  fs.writeFileSync(path.join(root,'AGENTS.md'),'Nur Simulation.');fs.writeFileSync(path.join(root,'ui/style.css'),'body{color:red}');
  for(const suffix of ['', '-lord', '-lord-breakout'])fs.writeFileSync(path.join(root,'ui/characters/chimera'+suffix+'.png'),'SECRET-ART');
+ fs.writeFileSync(path.join(root,'ui/characters/pixel-atlas-secret.png'),'SECRET-PIXEL-ART');
  fs.writeFileSync(path.join(root,'.sim/ui-state.json'),JSON.stringify({version:1,rewardCatalogVersion:2,masteryCatalogVersion:2,companionLevelVersion:2,model:'gpt-6-luna',session:null,archives,companionChosen:false}));
  let clock=Date.parse('2026-10-21T12:00:00Z'),available=true;
  const app=createApp({root,now:()=>clock,authCheck:async()=>({available})});await app.ready;await new Promise(resolve=>app.server.listen(0,'127.0.0.1',resolve));
@@ -44,6 +45,7 @@ test('asset revalidation avoids transferring unchanged bytes and keeps gated ass
  for(const suffix of ['', '-lord', '-lord-breakout']){
    const secret=await f.request('/characters/chimera'+suffix+'.png',undefined,{'If-None-Match':'*'});assert.equal(secret.status,404);assert.equal(secret.headers.get('etag'),null);await secret.text();
  }
+ const pixelSecret=await f.request('/characters/pixel-atlas-secret.png',undefined,{'If-None-Match':'*'});assert.equal(pixelSecret.status,404);assert.equal(pixelSecret.headers.get('etag'),null);await pixelSecret.text();
  const state=await f.request('/api/state');assert.equal(state.headers.get('cache-control'),'no-store');
 });
 test('unchanged DOM fragments survive rendering and Markdown cache remains safe and bounded',()=>{

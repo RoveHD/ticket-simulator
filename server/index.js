@@ -9,8 +9,12 @@ let sea;
 try { sea = require('node:sea'); } catch {}
 const { createBridge, abortError } = require('./codex');
 const { progression } = require('./progression');
+const { arcaneView, arcaneRewards, spin, validArcanePersistence } = require('./arcane');
+const { leaderboard } = require('./leaderboard');
 const { legacyPassFrames, retainedPassFrames, legacyMasteryRewards, canonicalPortraitId, canonicalMasteryReward } = require('./challenges');
 const { CHARACTERS } = require('./characters');
+const { RANKED_RULES_VERSION } = require('./ranked');
+const { EXTRA_KINDS } = require('./pass-extras');
 const { companionState, rewardForArchive, legacyLevelOffsets } = require('./companions');
 const { abilityClock, activateAbility, consumeAbility, sessionAbilityReward } = require('./abilities');
 const { difficultyFor } = require('./difficulty');
@@ -26,6 +30,7 @@ function createApp(options = {}) {
   const rules = read(path.join(root, 'AGENTS.md'));
   if (!rules.trim()) fail('AGENTS.md mit den Simulationsregeln fehlt.', 500);
   let state = loadState(stateFile, process.env.SIM_MODEL);
+  if (!validArcanePersistence(state)) fail('Der gespeicherte Arcane-Spielstand ist ungültig. Er wurde nicht überschrieben.', 500);
   if (state.companionLevelVersion === undefined) {
     state = { ...state, companionLevelVersion: 2, companionXpOffsets: legacyLevelOffsets(state.archives) };
   }
@@ -58,14 +63,15 @@ function createApp(options = {}) {
     const time = now().getTime();
     if (gameCache?.state === state && time >= gameCache.time && time < gameCache.until) return gameCache.game;
     const game = progression(state.archives, new Date(time), state);
-    game.inventory.push(...retainedPassFrames(state.legacyPassFrameIds));
+    game.inventory.push(...retainedPassFrames(state.legacyPassFrameIds), ...arcaneRewards(state));
     const ownedIds = new Set(game.inventory.map(reward => reward.id));
     for (const oldReward of legacyMasteryRewards(game, state.legacyMasteryRewardIds || [])) {
       const reward = canonicalMasteryReward(oldReward);
       if (ownedIds.has(reward.id)) continue;
       game.inventory.push(reward); ownedIds.add(reward.id);
     }
-    const defaults = { portrait: 'portrait-wolf-base', title: 'title-rookie', badge: 'badge-recruit' };
+    const defaults = { portrait: 'portrait-wolf-base', title: 'title-rookie', badge: 'badge-recruit',
+      ...Object.fromEntries(EXTRA_KINDS.map(kind => [kind, null])) };
     game.cosmetics = Object.fromEntries(Object.entries(defaults).map(([kind, fallback]) => [kind,
       game.inventory.some(item => item.kind === kind && item.id === (kind === 'portrait' ? canonicalPortraitId(state.cosmetics?.[kind]) : state.cosmetics?.[kind]))
         ? (kind === 'portrait' ? canonicalPortraitId(state.cosmetics[kind]) : state.cosmetics[kind]) : fallback]));
@@ -73,6 +79,7 @@ function createApp(options = {}) {
       game.inventory.some(item => item.kind === 'portrait' && item.id === state.cosmetics?.portrait));
     game.companion = companionState({ ...state, cosmetics: { ...state.cosmetics, portrait: canonicalPortraitId(state.cosmetics?.portrait) } }, game);
     game.companionChosen = game.companion.activeId !== null;
+    game.arcane = arcaneView(state, { passLevel: game.battlepass.level, activeId: game.companion.activeId, now: new Date(time) });
     // UTC mission rollover and future-dated archives both change time-based rewards.
     let until = Math.floor(time / 86400000) * 86400000 + 86400000;
     for (const archive of state.archives) {
@@ -237,8 +244,8 @@ function createApp(options = {}) {
         contacts: current.queue.map(item => ({ requester: item.requester, department: item.department })),
         ticket: current.ticket, mode: session.mode, level: session.level, duration: session.duration, elapsed: current.elapsed,
         waiting: current.waiting, reference: current.hidden.tickets[0].referenceMinutes, summary: current.summary, report: current.report,
-        abilityRewards: nextSession.abilityRewards || [] };
-      archive.companionReward = rewardForArchive(archive, companionId, state.archives, state.companionXpOffsets);
+        abilityRewards: nextSession.abilityRewards || [], rankedRulesVersion: RANKED_RULES_VERSION };
+      archive.companionReward = rewardForArchive(archive, companionId, state.archives, state.companionXpOffsets, state.arcane);
       nextSession.companionReward = archive.companionReward;
       next.archives.push(archive);
     }
@@ -295,10 +302,27 @@ function createApp(options = {}) {
       if (route.startsWith('/api/')) {
         if (!authenticated(req)) return send(res, 403, { error: 'Ungültiger Sitzungsschutz. Bitte lade die Seite neu.' });
         if (route === '/api/state' && req.method === 'GET') { await ready; return send(res, 200, publicState()); }
+        if (route === '/api/leaderboard' && req.method === 'GET') {
+          await ready;
+          const filters = {};
+          for (const [key, value] of url.searchParams) {
+            if (!['mode','duration','limit','offset','from','to'].includes(key) || Object.hasOwn(filters, key)) fail('Ungültiger Leaderboard-Filter.', 400);
+            filters[key] = ['duration','limit','offset'].includes(key) ? Number(value) : value;
+          }
+          return send(res, 200, leaderboard(state.archives, filters));
+        }
         if (req.method !== 'POST') return send(res, 405, { error: 'Methode nicht erlaubt.' });
         const input = await body(req);
         if (route === '/api/cancel') { operation?.abort(); return send(res, 200, publicState()); }
-        if (route === '/api/connection') {
+        if (route === '/api/arcane/spin') {
+          let receipt, replayed;
+          await exclusive(async () => {
+            const result = spin(state, input, { randomInt: options.arcaneRandomInt, now: now() });
+            if (!result.replayed) commit(result.nextState);
+            receipt = result.receipt; replayed = result.replayed;
+          }, res);
+          return send(res, 200, { receipt, replayed, state: publicState() });
+        } else if (route === '/api/connection') {
           await exclusive(async signal => { await ready; await refresh(signal); }, res);
         } else if (route === '/api/audio') {
           if (!validAudio(input.audio)) fail('Ungültige Audioeinstellungen.', 400);
@@ -307,9 +331,14 @@ function createApp(options = {}) {
           // turn() merges the latest preferences after the AI response arrives.
           commit({ ...state, audio: { ...state.audio, ...input.audio } });
         } else if (route === '/api/cosmetics') {
-          if (!['portrait', 'title', 'badge'].includes(input.kind) || typeof input.id !== 'string') fail('Ungültige Profilauswahl.', 400);
+          if (!['portrait', 'title', 'badge', ...EXTRA_KINDS].includes(input.kind) ||
+              (typeof input.id !== 'string' && !(EXTRA_KINDS.includes(input.kind) && input.id === null))) fail('Ungültige Profilauswahl.', 400);
           await exclusive(async () => {
             const game = gameState();
+            if (EXTRA_KINDS.includes(input.kind) && input.id === null) {
+              commit({ ...state, cosmetics: { ...game.cosmetics, [input.kind]: null } });
+              return;
+            }
             const selectedId = input.kind === 'portrait' ? canonicalPortraitId(input.id) : input.id;
             const reward = game.inventory.find(item => item.id === selectedId && item.kind === input.kind);
             if (!reward) fail('Diese Belohnung ist noch nicht freigeschaltet.', 400);
@@ -378,16 +407,24 @@ function createApp(options = {}) {
       }
       if (!['GET', 'HEAD'].includes(req.method)) return send(res, 405, { error: 'Methode nicht erlaubt.' });
       const files = { '/': ['index.html', 'text/html; charset=utf-8'], '/index.html': ['index.html', 'text/html; charset=utf-8'],
+        '/arcane.js': ['arcane.js', 'text/javascript; charset=utf-8'], '/arcane-effects.js': ['arcane-effects.js', 'text/javascript; charset=utf-8'], '/arcane.css': ['arcane.css', 'text/css; charset=utf-8'],
+        '/pass-extras.js': ['pass-extras.js', 'text/javascript; charset=utf-8'], '/pass-extras.css': ['pass-extras.css', 'text/css; charset=utf-8'],
         '/progression.js': ['progression.js', 'text/javascript; charset=utf-8'], '/progression.css': ['progression.css', 'text/css; charset=utf-8'],
         '/passives.js': ['passives.js', 'text/javascript; charset=utf-8'],
         '/ranks.css': ['ranks.css', 'text/css; charset=utf-8'], '/viewport.css': ['viewport.css', 'text/css; charset=utf-8'],
+        '/pixel.css': ['pixel.css', 'text/css; charset=utf-8'],
+        '/fonts/pixel-arcade.ttf': ['fonts/pixel-arcade.ttf', 'font/ttf'],
+        '/fonts/OFL-Silkscreen.txt': ['fonts/OFL-Silkscreen.txt', 'text/plain; charset=utf-8'],
         '/game.js': ['game.js', 'text/javascript; charset=utf-8'], '/game.css': ['game.css', 'text/css; charset=utf-8'],
         '/music/pixel-rush.ogg': ['music/pixel-rush.ogg', 'audio/ogg'],
         '/play.js': ['play.js', 'text/javascript; charset=utf-8'], '/play.css': ['play.css', 'text/css; charset=utf-8'],
         '/audio.js': ['audio.js', 'text/javascript; charset=utf-8'], '/menu.js': ['menu.js', 'text/javascript; charset=utf-8'], '/arcade.css': ['arcade.css', 'text/css; charset=utf-8'],
         '/style.css': ['style.css', 'text/css; charset=utf-8'], '/app.js': ['app.js', 'text/javascript; charset=utf-8'] };
-      const secretRoute = ['/characters/chimera.png', '/characters/chimera-lord.png', '/characters/chimera-lord-breakout.png'].includes(route);
+      const secretRoute = ['/characters/chimera.png', '/characters/chimera-lord.png', '/characters/chimera-lord-breakout.png', '/characters/pixel-atlas-secret.png'].includes(route);
       const secretUnlocked = secretRoute && gameState().characters.find(character => character.id === 'chimera')?.unlocked === true;
+      for (const atlas of ['a','b','c','d', ...(secretUnlocked ? ['secret'] : [])]) {
+        files[`/characters/pixel-atlas-${atlas}.png`] = [`characters/pixel-atlas-${atlas}.png`, 'image/png'];
+      }
       for (const { id, secret } of CHARACTERS) {
         if (secret && !secretUnlocked) continue;
         for (const suffix of ['', '-lord', '-lord-breakout']) {
@@ -419,8 +456,11 @@ function createApp(options = {}) {
   async function close() {
     closing = true;
     operation?.abort();
-    await new Promise(resolve => server.close(resolve));
-    server.closeIdleConnections?.();
+    const stopped = new Promise(resolve => server.close(resolve));
+    // The window is closing: idle/preconnected sockets must not delay shutdown.
+    // In-flight inference is already aborted, and all commits are atomic.
+    server.closeAllConnections?.();
+    await stopped;
   }
   return { server, close, ready };
 }
