@@ -26,7 +26,7 @@ module.exports = async (win, directory, painted) => {
         const ctx=canvas.getContext('2d');ctx.drawImage(sheet,col*cellWidth+cellWidth*.04,row*cellHeight,cellWidth*.92,cellHeight,0,0,100,100);
         const pixels=ctx.getImageData(0,0,100,100).data;let transparent=0,solid=0;
         for(let i=3;i<pixels.length;i+=4){if(pixels[i]===0)transparent++;if(pixels[i]>240)solid++;}
-        if(transparent<1000||solid<1000)throw Error('Schlange ist nicht sauber freigestellt');
+        if(transparent<1000||solid<1000)throw Error('Schlange ist nicht sauber freigestellt: '+JSON.stringify({transparent,solid,width:${width},tier:'${tier}',col,row,rows,source:sheet.currentSrc,naturalWidth:sheet.naturalWidth,naturalHeight:sheet.naturalHeight,complete:sheet.complete,contextLost:ctx.isContextLost?.(),colorSpace:ctx.getContextAttributes?.().colorSpace}));
         if(creature.getBoundingClientRect().top>=frame.getBoundingClientRect().top-8)throw Error('Schlange ragt nicht über den Rahmen');
         if(getComputedStyle(frame).overflowY!=='visible')throw Error('Rahmen schneidet den Kopf ab');
         const motion=creature.getAnimations().find(a=>a.animationName.startsWith('creature-'));
